@@ -13,6 +13,63 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.card{
+  color:#f9f9f9;
+  background-color: #213547;
+  border-radius: 2%;
+}
+
+.card.automation{
+  width: 500px;
+  height: 120px;
+  position: absolute;
+  top: 0;
+  left: calc(30px + 250px);
+  margin: 10px;
+  text-align:justify;
+  vertical-align: top;
+  padding-top: 0;
+  line-height: 1;
+}
+
+.autoinfo{
+  display: flex;
+  gap: 50px;
+}
+
+.card.business{
+  width: 250px;
+  height: 425px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 10px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px; /* Espaço interno para afastar a borda do texto */
+}
+
+.sellprice{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.mini_info{
+  font-size: 12px;
+}
+
+.time {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
