@@ -1,13 +1,19 @@
 <script setup>
 import { usePaperclipGame } from './composables/usePaperclipGame.js'
 import { formatPrice } from './utils/helpers/formatPrice.js';
-const { copperWireinMeter, funds, priceOfCopper, availableCopper, workers, week, month, year, FabricarPaperclip, buy_worker, buy_refined_copper, buy_chance, increasePrice, decreasePrice } = usePaperclipGame()
+const { copperWireinMeter, funds, priceOfCopper, availableCopper, workers, workersPrice, logs, week, month, year, FabricarPaperclip, logMessage, buy_worker, buy_refined_copper, buy_chance, increasePrice, decreasePrice } = usePaperclipGame()
 </script>
 
 <template>
-  <div class="time">
+  <div class="terminal">
+    <div class="time">
   📅 Week: {{ week }} | 📆 Month: {{ month }} | 📅 Year: {{ year }}
+    </div>
+    <div v-for="(msg, index) in logs" :key="index" class="log-message">
+        {{ msg }}
+    </div>
   </div>
+ 
     <div class="card business">
       <h3>Copper wire: {{ copperWireinMeter }} meters</h3>
       <button @click="FabricarPaperclip">Make Copper Wire</button>
@@ -28,7 +34,7 @@ const { copperWireinMeter, funds, priceOfCopper, availableCopper, workers, week,
       <h3>Automation</h3>
       <div class="autoinfo">
         <button @click="buy_worker">Buy worker</button>
-        <p>Price: NaN</p>
+        <p>Price: ${{ formatPrice(workersPrice) }}</p>
         <p>Amount of workers: {{ workers }}</p>
       </div>
       <p class="mini_info">Generates 1 meter of copper per tick(second)</p>

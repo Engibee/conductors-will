@@ -25,6 +25,7 @@ const workersPrice = ref(150.0)
 const week = ref(0)
 const month = ref(0)
 const year = ref(0)
+const logs = ref([])
 
 const update_tick = () => {
     ticks.value++
@@ -38,6 +39,9 @@ const update_tick = () => {
   if (ticks_events(1)){
     automation_handler()
   }
+}
+function logMessage(message) {
+  logs.value.push(`[${new Date().toLocaleTimeString()}] ${message}`);
 }
 function automation_handler(){
   if (availableCopper.value >= (copperQtPerMeter * workers.value)){
@@ -100,11 +104,12 @@ function FabricarPaperclip(){
     }
 }
 function increasePrice(){
-    priceOfCopper.value += 0.10
+    priceOfCopper.value += 0.01
 }
 function decreasePrice(){
-  if (priceOfCopper.value > 1e-6){
-    priceOfCopper.value -= 0.10
+  if (priceOfCopper.value > Number.EPSILON){
+    priceOfCopper.value -= 0.01;
+    priceOfCopper.value = Math.max(0, priceOfCopper.value);
   }
 }
 return{
@@ -113,10 +118,13 @@ return{
     funds,
     priceOfCopper,
     workers,
+    workersPrice,
     week,
     month,
     year,
+    logs,
     FabricarPaperclip,
+    logMessage,
     buy_worker,
     buy_refined_copper,
     buy_chance,
