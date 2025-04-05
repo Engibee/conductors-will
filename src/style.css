@@ -13,21 +13,42 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.containers{
+  display: grid;
+  gap: 0px;
+  padding: 10px;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
 .card{
   color:#f9f9f9;
   background-color: #213547;
   border-radius: 2%;
 }
 
+.card.market{
+  grid-column: 2; /* Fica na primeira coluna */
+  grid-row: 1; /* Fica na primeira linha */
+  margin-left: 10px;
+  margin-top: 160px;
+}
+
+.card.sellchart{
+  margin-top: 10px;
+  width: 269px;
+  height: 114px;
+  padding: 0;
+}
+
 .card.automation{
+  grid-column: 2; /* Fica na primeira coluna */
+  grid-row: 1; /* Fica na primeira linha */
   width: 500px;
   height: 120px;
-  position: absolute;
-  top: 0;
-  left: calc(30px + 250px);
-  margin: 10px;
+  margin-left: 10px;
   text-align:justify;
-  vertical-align: top;
   padding-top: 0;
   line-height: 1;
 }
@@ -38,14 +59,13 @@
 }
 
 .card.business{
+  grid-column: 1; /* Fica na primeira coluna */
+  grid-row: 1; /* Fica na primeira linha */
   width: 250px;
   height: 425px;
-  position: absolute;
   top: 0;
   left: 0;
-  margin: 10px;
   justify-content: space-between;
-  align-items: center;
   padding: 10px; /* Espaço interno para afastar a borda do texto */
 }
 
@@ -59,19 +79,20 @@
   font-size: 12px;
 }
 
-.terminal {
-  width: 380px;
+.card.terminal {
+  grid-column: 3; /* Fica na primeira coluna */
+  grid-row: 1; /* Fica na primeira linha */
+  width: 385px;
   height: 150px;
-  position: absolute;
+  margin-left: 10px;
   top: 0px;
-  left: 855px;
-  margin: 10px;
   color:#f9f9f9;
   background-color: #213547;
   padding: 10px;
   overflow-y: auto;
   border-radius: 5px;
   font-family: monospace;
+  flex-grow: 1;
 }
 
 .log-message {
