@@ -2,13 +2,28 @@ import { ref, onMounted, onUnmounted, watch } from "vue";
 import Chart from "chart.js/auto";
 
 let chartInstance = null;
+let chartLabel = ref([]);
+let chartData = ref([]);
 
-export function atualizarGrafico(newSale, month) {
+export function chartUpdate(newSale, month) {
+  //Global reference update
+  chartLabel.value.push(month);
+  chartData.value.push(newSale);
+
+  //Instance update
   if (!chartInstance) return;
   chartInstance.data.labels.push(month); // mês
   chartInstance.data.datasets[0].data.push(newSale);
   chartInstance.update();
-}
+};
+
+export function chartInstanceUpdateOnly(newSale, month) {
+  //Instance update
+  if (!chartInstance) return;
+  chartInstance.data.labels.push(...month); // mês
+  chartInstance.data.datasets[0].data.push(...newSale);
+  chartInstance.update();
+};
 
 export function salesChart(canvasElement) {
   const graficoCanvas = ref(null); // vai ser usado no <canvas ref="">
@@ -82,6 +97,7 @@ export function salesChart(canvasElement) {
 export function usePaperclipGame() {
   onMounted(() => {
     intervalo = setInterval(update_tick, 1000);
+    load_game_data();
     console.log(`O contador foi montado.`);
   });
   onUnmounted(() => {
@@ -89,20 +105,27 @@ export function usePaperclipGame() {
     clearInterval(intervalo);
     console.log(`O contador foi limpado/destruído.`);
   });
-  const ticks = ref(0);
-  let intervalo = null;
+  //STOCK HANDLE
   const copperWireinMeter = ref(0);
   const availableCopper = ref(10);
-  const copperQtPerMeter = 0.02232;
-  const funds = ref(30);
-  const priceOfCopper = ref(0.5);
-  const kgOfCopper = 9.795;
   const workers = ref(0);
+  const funds = ref(30);
+
+  //PRICES HANDLE
+  const copperQtPerMeter = 0.02232;
+  const kgOfCopper = 9.795;
+  const priceOfCopper = ref(0.5);
   const workersPrice = ref(150.0);
   const monthlySale = ref(0);
+
+  //TIME HANDLE
+  let intervalo = null;
+  const ticks = ref(0);
   const week = ref(0);
   const month = ref(1);
   const year = ref(0);
+
+  //LISTS
   const logs = ref([]);
 
   const update_tick = () => {
@@ -115,12 +138,52 @@ export function usePaperclipGame() {
       time_handler();
     }
     if (ticks_events(1)) {
+      store_game_data();
       automation_handler();
     }
   };
+  function load_game_data() {
+    const stored_state = localStorage.getItem("gameState");
+    if (stored_state) {
+      const data = JSON.parse(stored_state);
+      ticks.value = data.ticks;
+      copperWireinMeter.value = data.copperWireinMeter;
+      availableCopper.value = data.availableCopper;
+      funds.value = data.funds;
+      priceOfCopper.value = data.priceOfCopper;
+      workers.value = data.workers;
+      workersPrice.value = data.workersPrice;
+      monthlySale.value = data.monthlySale;
+      week.value = data.week;
+      month.value = data.month;
+      year.value = data.year;
+      logs.value = data.logs;
+      chartInstanceUpdateOnly(data.chartData,data.chartLabel);
+    }
+  }
+  function store_game_data() {
+    const state = {
+      ticks: ticks.value,
+      copperWireinMeter: copperWireinMeter.value,
+      availableCopper: availableCopper.value,
+      funds: funds.value,
+      priceOfCopper: priceOfCopper.value,
+      workers: workers.value,
+      workersPrice: workersPrice.value,
+      monthlySale: monthlySale.value,
+      week: week.value,
+      month: month.value,
+      year: year.value,
+      logs: logs.value,
+      chartLabel: chartLabel.value,
+      chartData: chartData.value
+    };
+    localStorage.setItem("gameState", JSON.stringify(state));
+  }
   function monthly_sale_graphs_handler(){
-    atualizarGrafico(monthlySale.value, month.value);
+    chartUpdate(monthlySale.value, month.value);
     monthlySale.value = 0;
+    logMessage("Receita do mês atualizada!");
   }
   function logMessage(message) {
     logs.value.push(`[${new Date().toLocaleTimeString()}] ${message}`);
@@ -147,6 +210,7 @@ export function usePaperclipGame() {
   }
   function time_handler() {
     if (month.value == 12 && week.value == 4) {
+      monthly_sale_graphs_handler();
       year.value++;
       month.value = 1;
       week.value = 0;
