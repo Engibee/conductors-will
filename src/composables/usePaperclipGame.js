@@ -99,6 +99,7 @@ export function usePaperclipGame() {
   onMounted(() => {
     intervalo = setInterval(update_tick, 1000);
     console.log(`O contador foi montado.`);
+    clearGame();
     const data = loadGame();
     if (data) {
       ticks.value = data.ticks;

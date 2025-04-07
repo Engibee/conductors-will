@@ -41,7 +41,10 @@
 }
 
 .perks-container {
+  height: 188px;
+  width: 322px;
   border: 2px solid rgb(255, 255, 255);
+  border-radius: 2%;
   background-color: #1a1a1a;
   padding: 1rem;
   margin-top: 1rem;
