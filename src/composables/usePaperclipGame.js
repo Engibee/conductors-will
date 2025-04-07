@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted, watch } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import { saveGame, loadGame, clearGame } from "./localStorage";
 import Chart from "chart.js/auto";
 
@@ -228,6 +228,10 @@ export function usePaperclipGame() {
     return priceFactor * marketingFactor;
   }
 
+  const currentDemand = computed(() => {
+    return buy_chance(priceOfCopper.value, marketing.value);
+  });
+
   function buy_simulation_per_tick() {
     const modifier = buy_chance(priceOfCopper.value, marketing.value);
 
@@ -269,6 +273,7 @@ export function usePaperclipGame() {
     workers,
     workersPrice,
     marketing,
+    currentDemand,
     week,
     month,
     year,
@@ -277,7 +282,6 @@ export function usePaperclipGame() {
     logMessage,
     buy_worker,
     buy_refined_copper,
-    buy_chance,
     increasePrice,
     decreasePrice,
   };

@@ -11,6 +11,7 @@ const {
   workers,
   workersPrice,
   marketing,
+  currentDemand,
   logs,
   week,
   month,
@@ -19,7 +20,6 @@ const {
   logMessage,
   buy_worker,
   buy_refined_copper,
-  buy_chance,
   increasePrice,
   decreasePrice,
 } = usePaperclipGame();
@@ -39,7 +39,7 @@ const {
         Selling price: ${{ formatPrice(priceOfCopper) }}
       </p>
       <p>
-        Demand: <strong>{{ formatPrice(buy_chance(priceOfCopper)) }}</strong>
+        Demand: <strong>{{ formatPrice(currentDemand) }}</strong>
       </p>
       <p>Refined Copper: {{ formatPrice(availableCopper) }} kg</p>
       <button @click="buy_refined_copper">Buy Refined Copper</button>
