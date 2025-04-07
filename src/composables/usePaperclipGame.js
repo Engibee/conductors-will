@@ -1,4 +1,5 @@
 import { ref, onMounted, onUnmounted, watch } from "vue";
+import { saveGame, loadGame, clearGame } from "./localStorage";
 import Chart from "chart.js/auto";
 
 let chartInstance = null;
@@ -15,7 +16,7 @@ export function chartUpdate(newSale, month) {
   chartInstance.data.labels.push(month); // mês
   chartInstance.data.datasets[0].data.push(newSale);
   chartInstance.update();
-};
+}
 
 export function chartInstanceUpdateOnly(newSale, month) {
   //Instance update
@@ -23,7 +24,7 @@ export function chartInstanceUpdateOnly(newSale, month) {
   chartInstance.data.labels.push(...month); // mês
   chartInstance.data.datasets[0].data.push(...newSale);
   chartInstance.update();
-};
+}
 
 export function salesChart(canvasElement) {
   const graficoCanvas = ref(null); // vai ser usado no <canvas ref="">
@@ -97,8 +98,23 @@ export function salesChart(canvasElement) {
 export function usePaperclipGame() {
   onMounted(() => {
     intervalo = setInterval(update_tick, 1000);
-    load_game_data();
     console.log(`O contador foi montado.`);
+    const data = loadGame();
+    if (data) {
+      ticks.value = data.ticks;
+      copperWireinMeter.value = data.copperWireinMeter;
+      availableCopper.value = data.availableCopper;
+      funds.value = data.funds;
+      priceOfCopper.value = data.priceOfCopper;
+      workers.value = data.workers;
+      workersPrice.value = data.workersPrice;
+      monthlySale.value = data.monthlySale;
+      week.value = data.week;
+      month.value = data.month;
+      year.value = data.year;
+      logs.value = data.logs;
+      chartInstanceUpdateOnly(data.chartData, data.chartLabel);
+    }
   });
   onUnmounted(() => {
     // Limpa o intervalo quando o componente for destruído
@@ -115,8 +131,9 @@ export function usePaperclipGame() {
   const copperQtPerMeter = 0.02232;
   const kgOfCopper = 9.795;
   const priceOfCopper = ref(0.5);
-  const workersPrice = ref(150.0);
+  const workersPrice = ref(35.0);
   const monthlySale = ref(0);
+  const marketing = ref(50);
 
   //TIME HANDLE
   let intervalo = null;
@@ -136,51 +153,29 @@ export function usePaperclipGame() {
     }
     if (ticks_events(10)) {
       time_handler();
+      marketing.value >= 1 ? marketing.value-- : null;
     }
     if (ticks_events(1)) {
-      store_game_data();
       automation_handler();
+      saveGame({
+        ticks: ticks.value,
+        copperWireinMeter: copperWireinMeter.value,
+        availableCopper: availableCopper.value,
+        funds: funds.value,
+        priceOfCopper: priceOfCopper.value,
+        workers: workers.value,
+        workersPrice: workersPrice.value,
+        monthlySale: monthlySale.value,
+        week: week.value,
+        month: month.value,
+        year: year.value,
+        logs: logs.value,
+        chartLabel: chartLabel.value,
+        chartData: chartData.value,
+      });
     }
   };
-  function load_game_data() {
-    const stored_state = localStorage.getItem("gameState");
-    if (stored_state) {
-      const data = JSON.parse(stored_state);
-      ticks.value = data.ticks;
-      copperWireinMeter.value = data.copperWireinMeter;
-      availableCopper.value = data.availableCopper;
-      funds.value = data.funds;
-      priceOfCopper.value = data.priceOfCopper;
-      workers.value = data.workers;
-      workersPrice.value = data.workersPrice;
-      monthlySale.value = data.monthlySale;
-      week.value = data.week;
-      month.value = data.month;
-      year.value = data.year;
-      logs.value = data.logs;
-      chartInstanceUpdateOnly(data.chartData,data.chartLabel);
-    }
-  }
-  function store_game_data() {
-    const state = {
-      ticks: ticks.value,
-      copperWireinMeter: copperWireinMeter.value,
-      availableCopper: availableCopper.value,
-      funds: funds.value,
-      priceOfCopper: priceOfCopper.value,
-      workers: workers.value,
-      workersPrice: workersPrice.value,
-      monthlySale: monthlySale.value,
-      week: week.value,
-      month: month.value,
-      year: year.value,
-      logs: logs.value,
-      chartLabel: chartLabel.value,
-      chartData: chartData.value
-    };
-    localStorage.setItem("gameState", JSON.stringify(state));
-  }
-  function monthly_sale_graphs_handler(){
+  function monthly_sale_graphs_handler() {
     chartUpdate(monthlySale.value, month.value);
     monthlySale.value = 0;
     logMessage("Receita do mês atualizada!");
@@ -226,19 +221,28 @@ export function usePaperclipGame() {
     return ticks.value % tick === 0;
   }
 
-  function buy_chance(price) {
-    return 0.8 * Math.exp(-((price - 0.5) / 0.2));
+  function buy_chance(price, marketing = 0) {
+    // A demanda base é maior quando o preço é baixo
+    const priceFactor = Math.exp(-((price - 0.5) / 0.2));
+    const marketingFactor = 1 + marketing / 100; // Cada nível de marketing = +1%
+    return priceFactor * marketingFactor;
   }
 
   function buy_simulation_per_tick() {
-    const chance = buy_chance(priceOfCopper.value);
-    if (Math.random() < chance) {
-      const quantity = Math.floor(Math.random() * 10) + 1;
-      if (copperWireinMeter.value >= quantity) {
-        copperWireinMeter.value -= quantity;
-        funds.value += quantity * priceOfCopper.value;
-        monthlySale.value += quantity * priceOfCopper.value;
-      }
+    const modifier = buy_chance(priceOfCopper.value, marketing.value);
+
+    // Base de vendas aleatória entre 2 e 10 (por exemplo)
+    const base = Math.floor(Math.random() * 9) + 2;
+
+    // A quantidade final vendida é a base * modificador
+    const quantity = Math.floor(base * modifier);
+
+    if (quantity > 0 && copperWireinMeter.value >= quantity) {
+      copperWireinMeter.value -= quantity;
+
+      const revenue = quantity * priceOfCopper.value;
+      funds.value += revenue;
+      monthlySale.value += revenue;
     }
   }
 
@@ -264,6 +268,7 @@ export function usePaperclipGame() {
     priceOfCopper,
     workers,
     workersPrice,
+    marketing,
     week,
     month,
     year,

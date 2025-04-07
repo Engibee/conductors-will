@@ -10,6 +10,7 @@ const {
   availableCopper,
   workers,
   workersPrice,
+  marketing,
   logs,
   week,
   month,
@@ -38,7 +39,7 @@ const {
         Selling price: ${{ formatPrice(priceOfCopper) }}
       </p>
       <p>
-        Demanda: <strong>{{ formatPrice(buy_chance(priceOfCopper)) }}</strong>
+        Demand: <strong>{{ formatPrice(buy_chance(priceOfCopper)) }}</strong>
       </p>
       <p>Refined Copper: {{ formatPrice(availableCopper) }} kg</p>
       <button @click="buy_refined_copper">Buy Refined Copper</button>
@@ -65,7 +66,16 @@ const {
       <canvas ref="graficoCanvas"></canvas>
     </div>
     <div class="card market">
-      
+      <h2>MARKET</h2>
+      <div class="marketing">
+        <div class="marketing bar">
+          <div
+            class="marketing fill"
+            :style="{ height: marketing + '%' }"
+          ></div>
+        </div>
+        <p>{{ marketing }}%</p>
+      </div>
     </div>
   </div>
 </template>
