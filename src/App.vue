@@ -11,15 +11,18 @@ const {
   workers,
   workersPrice,
   marketing,
+  marketingPrice,
   currentDemand,
   logs,
   week,
   month,
   year,
+  perks,
   FabricarPaperclip,
   logMessage,
   buy_worker,
   buy_refined_copper,
+  buy_marketing,
   increasePrice,
   decreasePrice,
 } = usePaperclipGame();
@@ -65,16 +68,30 @@ const {
     <div class="card sellchart">
       <canvas ref="graficoCanvas"></canvas>
     </div>
-    <div class="card market">
-      <h2>MARKET</h2>
-      <div class="marketing">
-        <div class="marketing bar">
+    <div class="card lab">
+      <h4 class="labtitle">Lab Research</h4>
+      <div class="marketing-container">
+        <div class="marketing-bar">
           <div
-            class="marketing fill"
+            class="marketing-fill"
             :style="{ height: marketing + '%' }"
           ></div>
         </div>
-        <p>{{ marketing }}%</p>
+        <div class="marketing-info">
+          <p>Marketing: {{ marketing }}%</p>
+          <button @click="buy_marketing">Buy</button>
+          <p>Price: ${{ formatPrice(marketingPrice) }}</p>
+        </div>
+      </div>
+      <div class="perks-container">
+        <div v-if="perks.unlocked.discountPerk" class="perk-box">
+          <p>
+            5% discount on marketing<br />Never leave your marketing level below
+            5%
+          </p>
+          <p>Price: {{ discountPerkPrice }}</p>
+          <button @click="buyDiscountPerk">Buy</button>
+        </div>
       </div>
     </div>
   </div>

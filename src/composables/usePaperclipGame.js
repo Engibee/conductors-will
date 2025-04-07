@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted, computed } from "vue";
+import { ref, reactive, onMounted, onUnmounted, computed, watch } from "vue";
 import { saveGame, loadGame, clearGame } from "./localStorage";
 import Chart from "chart.js/auto";
 
@@ -108,6 +108,8 @@ export function usePaperclipGame() {
       priceOfCopper.value = data.priceOfCopper;
       workers.value = data.workers;
       workersPrice.value = data.workersPrice;
+      marketing.value = data.marketing;
+      marketingPrice.value = data.marketinPrice;
       monthlySale.value = data.monthlySale;
       week.value = data.week;
       month.value = data.month;
@@ -134,6 +136,7 @@ export function usePaperclipGame() {
   const workersPrice = ref(35.0);
   const monthlySale = ref(0);
   const marketing = ref(50);
+  const marketingPrice = ref(10);
 
   //TIME HANDLE
   let intervalo = null;
@@ -165,6 +168,8 @@ export function usePaperclipGame() {
         priceOfCopper: priceOfCopper.value,
         workers: workers.value,
         workersPrice: workersPrice.value,
+        marketing: marketing.value,
+        marketinPrice: marketingPrice.value,
         monthlySale: monthlySale.value,
         week: week.value,
         month: month.value,
@@ -175,6 +180,24 @@ export function usePaperclipGame() {
       });
     }
   };
+
+  const perks = reactive({
+    unlocked: {
+      discountPerk: false,
+      autoMarketingPerk: false,
+    },
+    owned: {
+      discountPerk: false,
+      autoMarketingPerk: false,
+    }
+  });
+
+  watch(() => monthlySale.value, (newVal) => {
+    if (newVal > 1 && !perks.unlocked.discountPerk) {
+      perks.unlocked.discountPerk = true;
+      logMessage("Perk de desconto liberado!");
+    }
+  });
   function monthly_sale_graphs_handler() {
     chartUpdate(monthlySale.value, month.value);
     monthlySale.value = 0;
@@ -201,6 +224,12 @@ export function usePaperclipGame() {
     if (funds.value >= workersPrice.value) {
       funds.value -= workersPrice.value;
       workers.value++;
+    }
+  }
+  function buy_marketing(){
+    if (funds.value >= marketingPrice.value){
+      marketing.value++;
+      funds.value -= marketingPrice.value;
     }
   }
   function time_handler() {
@@ -273,14 +302,17 @@ export function usePaperclipGame() {
     workers,
     workersPrice,
     marketing,
+    marketingPrice,
     currentDemand,
     week,
     month,
     year,
     logs,
+    perks,
     FabricarPaperclip,
     logMessage,
     buy_worker,
+    buy_marketing,
     buy_refined_copper,
     increasePrice,
     decreasePrice,

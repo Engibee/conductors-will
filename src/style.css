@@ -30,16 +30,43 @@
   border-radius: 2%;
 }
 
-.card.market{
+.card.lab{
   grid-column: 2; /* Fica na primeira coluna */
   grid-row: 1; /* Fica na primeira linha */
   height: 285px;
   margin-left: 10px;
   margin-top: 160px;
   padding: 0%;
+  position: relative;
 }
 
-.marketing.bar {
+.perks-container {
+  border: 2px solid rgb(255, 255, 255);
+  background-color: #1a1a1a;
+  padding: 1rem;
+  margin-top: 1rem;
+  margin: 2px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+h4{
+  color: #4caf50;
+}
+
+.perk-box {
+  border: 1px solid rgb(255, 255, 255);
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.marketing-container {
+  display: flex;
+  margin: 2px;
+}
+
+.marketing-bar {
   width: 30px;
   height: 200px;
   border: 2px solid #fff;
@@ -50,12 +77,20 @@
   margin-left: 10px;
 }
 
-.marketing.fill {
+.marketing-fill {
   width: 100%;
   background-color: #4caf50;
   position: absolute;
   bottom: 0;
   transition: height 0.3s ease;
+}
+
+.marketing-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-left: 10px; /* espaço entre barra e info */
 }
 
 .card.sellchart{
