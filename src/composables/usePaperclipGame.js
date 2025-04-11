@@ -1,5 +1,6 @@
 import { ref, reactive, onMounted, onUnmounted, computed, watch } from "vue";
 import { saveGame, loadGame, clearGame } from "./localStorage";
+import { formatDate } from "../utils/helpers/formatPrice.js";
 import Chart from "chart.js/auto";
 
 let chartInstance = null;
@@ -71,6 +72,21 @@ export function salesChart(canvasElement) {
           tooltip: {
             enabled: true, // remove o balãozinho ao passar o mouse
           },
+          zoom: {
+            pan: {
+              enabled: true,
+              mode: "x", // ou 'y', ou 'xy'
+            },
+            zoom: {
+              wheel: {
+                enabled: true, // Habilita zoom com a roda do mouse
+              },
+              pinch: {
+                enabled: true, // Habilita zoom com gesto de pinça (mobile)
+              },
+              mode: "x",
+            },
+          },
         },
         scales: {
           x: {
@@ -136,7 +152,7 @@ export function usePaperclipGame() {
   const priceOfCopper = ref(0.5);
   const workersPrice = ref(35.0);
   const monthlySale = ref(0);
-  const marketing = ref(50);
+  const marketing = ref(1);
   const marketingPrice = ref(10);
 
   //TIME HANDLE
@@ -151,13 +167,11 @@ export function usePaperclipGame() {
 
   const update_tick = () => {
     ticks.value++;
-    // Ação a cada 1 tick
-    if (ticks_events(5)) {
-      buy_simulation_per_tick();
-    }
     if (ticks_events(10)) {
       time_handler();
-      marketing.value >= 1 ? marketing.value-- : null;
+    }
+    if (ticks_events(5)) {
+      buy_simulation_per_tick();
     }
     if (ticks_events(1)) {
       automation_handler();
@@ -190,17 +204,20 @@ export function usePaperclipGame() {
     owned: {
       discountPerk: false,
       autoMarketingPerk: false,
-    }
+    },
   });
 
-  watch(() => monthlySale.value, (newVal) => {
-    if (newVal > 1 && !perks.unlocked.discountPerk) {
-      perks.unlocked.discountPerk = true;
-      logMessage("Perk de desconto liberado!");
+  watch(
+    () => monthlySale.value,
+    (newVal) => {
+      if (newVal > 1 && !perks.unlocked.discountPerk) {
+        perks.unlocked.discountPerk = true;
+        logMessage("Perk de desconto liberado!");
+      }
     }
-  });
+  );
   function monthly_sale_graphs_handler() {
-    chartUpdate(monthlySale.value, month.value);
+    chartUpdate(monthlySale.value, formatDate(month.value, year.value));
     monthlySale.value = 0;
     logMessage("Receita do mês atualizada!");
   }
@@ -227,11 +244,15 @@ export function usePaperclipGame() {
       workers.value++;
     }
   }
-  function buy_marketing(){
-    if (funds.value >= marketingPrice.value){
+  function buy_marketing() {
+    if (funds.value >= marketingPrice.value) {
       marketing.value++;
       funds.value -= marketingPrice.value;
+      marketingPrice.value = getMarketingPrice(marketing.value);
     }
+  }
+  function getMarketingPrice(marketingLevel) {
+    return Math.floor(10 * Math.pow(marketingLevel, 3));
   }
   function time_handler() {
     if (month.value == 12 && week.value == 4) {
@@ -254,7 +275,7 @@ export function usePaperclipGame() {
   function buy_chance(price, marketing = 0) {
     // A demanda base é maior quando o preço é baixo
     const priceFactor = Math.exp(-((price - 0.5) / 0.2));
-    const marketingFactor = 1 + marketing / 100; // Cada nível de marketing = +1%
+    const marketingFactor = Math.pow(1.07, marketing);
     return priceFactor * marketingFactor;
   }
 
