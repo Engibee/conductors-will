@@ -1,11 +1,38 @@
 import { ref, reactive, onMounted, onUnmounted, computed, watch } from "vue";
 import { saveGame, loadGame, clearGame } from "./localStorage";
-import { formatDate } from "../utils/helpers/formatPrice.js";
+import { formatDate } from "../utils/helpers/format.js";
 import Chart from "chart.js/auto";
 
 let chartInstance = null;
 let chartLabel = ref([]);
 let chartData = ref([]);
+
+ //STOCK HANDLE
+ const lifeTimeCopperWire = ref(0);
+ const copperWireinMeter = ref(0);
+ const availableCopper = ref(10);
+ const workers = ref(0);
+ export const funds = ref(30);
+
+
+ //PRICES HANDLE
+ const copperQtPerMeter = 0.02232;
+ const kgOfCopper = 9.795;
+ const priceOfCopper = ref(0.5);
+ const workersPrice = ref(35.0);
+ const monthlySale = ref(0);
+ const marketing = ref(1);
+ const marketingPrice = ref(10);
+
+ //TIME HANDLE
+ let intervalo = null;
+ const ticks = ref(0);
+ const week = ref(1);
+ const month = ref(1);
+ const year = ref(1);
+
+ //LISTS
+ const logs = ref([]);
 
 export function chartUpdate(newSale, month) {
   //Global reference update
@@ -120,6 +147,7 @@ export function usePaperclipGame() {
     if (data) {
       ticks.value = data.ticks;
       copperWireinMeter.value = data.copperWireinMeter;
+      lifeTimeCopperWire.value = data.lifeTimeCopperWire;
       availableCopper.value = data.availableCopper;
       funds.value = data.funds;
       priceOfCopper.value = data.priceOfCopper;
@@ -140,30 +168,6 @@ export function usePaperclipGame() {
     clearInterval(intervalo);
     console.log(`O contador foi limpado/destruído.`);
   });
-  //STOCK HANDLE
-  const copperWireinMeter = ref(0);
-  const availableCopper = ref(10);
-  const workers = ref(0);
-  const funds = ref(30);
-
-  //PRICES HANDLE
-  const copperQtPerMeter = 0.02232;
-  const kgOfCopper = 9.795;
-  const priceOfCopper = ref(0.5);
-  const workersPrice = ref(35.0);
-  const monthlySale = ref(0);
-  const marketing = ref(1);
-  const marketingPrice = ref(10);
-
-  //TIME HANDLE
-  let intervalo = null;
-  const ticks = ref(0);
-  const week = ref(0);
-  const month = ref(1);
-  const year = ref(0);
-
-  //LISTS
-  const logs = ref([]);
 
   const update_tick = () => {
     ticks.value++;
@@ -178,6 +182,7 @@ export function usePaperclipGame() {
       saveGame({
         ticks: ticks.value,
         copperWireinMeter: copperWireinMeter.value,
+        lifeTimeCopperWire: lifeTimeCopperWire.value,
         availableCopper: availableCopper.value,
         funds: funds.value,
         priceOfCopper: priceOfCopper.value,
@@ -207,15 +212,6 @@ export function usePaperclipGame() {
     },
   });
 
-  watch(
-    () => monthlySale.value,
-    (newVal) => {
-      if (newVal > 1 && !perks.unlocked.discountPerk) {
-        perks.unlocked.discountPerk = true;
-        logMessage("Perk de desconto liberado!");
-      }
-    }
-  );
   function monthly_sale_graphs_handler() {
     chartUpdate(monthlySale.value, formatDate(month.value, year.value));
     monthlySale.value = 0;
@@ -227,6 +223,7 @@ export function usePaperclipGame() {
   function automation_handler() {
     if (availableCopper.value >= copperQtPerMeter * workers.value) {
       copperWireinMeter.value += 1 * workers.value;
+      lifeTimeCopperWire.value += 1 * workers.value;
       availableCopper.value -= 1 * workers.value * copperQtPerMeter;
     } else {
       //Nothing yet.
@@ -259,11 +256,11 @@ export function usePaperclipGame() {
       monthly_sale_graphs_handler();
       year.value++;
       month.value = 1;
-      week.value = 0;
+      week.value = 1;
     } else if (week.value == 4) {
       monthly_sale_graphs_handler();
       month.value++;
-      week.value = 0;
+      week.value = 1;
     } else {
       week.value++;
     }
@@ -273,9 +270,10 @@ export function usePaperclipGame() {
   }
 
   function buy_chance(price, marketing = 0) {
-    // A demanda base é maior quando o preço é baixo
     const priceFactor = Math.exp(-((price - 0.5) / 0.2));
-    const marketingFactor = Math.pow(1.07, marketing);
+  
+    // Exponencial suave com base 1.03, dobra em ~24 níveis
+    const marketingFactor = Math.pow(1.03, marketing);
     return priceFactor * marketingFactor;
   }
 
@@ -284,17 +282,17 @@ export function usePaperclipGame() {
   });
 
   function buy_simulation_per_tick() {
-    const modifier = buy_chance(priceOfCopper.value, marketing.value);
-
-    // Base de vendas aleatória entre 2 e 10 (por exemplo)
-    const base = Math.floor(Math.random() * 9) + 2;
-
-    // A quantidade final vendida é a base * modificador
-    const quantity = Math.floor(base * modifier);
-
+    const level = marketing.value;
+  
+    // Base mínima e máxima ajustadas para dar mais aleatoriedade
+    const maxBase = 10 * Math.pow(2, level - 1);
+    const minBase = Math.floor(maxBase / 2.5);
+  
+    const quantity = Math.floor(Math.random() * (maxBase - minBase + 1)) + minBase;
+  
     if (quantity > 0 && copperWireinMeter.value >= quantity) {
       copperWireinMeter.value -= quantity;
-
+  
       const revenue = quantity * priceOfCopper.value;
       funds.value += revenue;
       monthlySale.value += revenue;
@@ -305,6 +303,7 @@ export function usePaperclipGame() {
     if (availableCopper.value >= copperQtPerMeter) {
       availableCopper.value -= copperQtPerMeter;
       copperWireinMeter.value++;
+      lifeTimeCopperWire.value++;
     }
   }
   function increasePrice() {
@@ -318,6 +317,7 @@ export function usePaperclipGame() {
   }
   return {
     copperWireinMeter,
+    lifeTimeCopperWire,
     availableCopper,
     funds,
     priceOfCopper,

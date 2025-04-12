@@ -13,6 +13,20 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.top-bar {
+  display: absolute;
+  position: fixed;
+  justify-content: flex-start;
+  text-align: left;
+  top: 0px;
+  left: 0px;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: white;
+  background-color: #1a2b3c; /* ou algo consistente com seu tema */
+  width: 100%;
+}
 .containers{
   display: grid;
   gap: 0px;
@@ -20,7 +34,7 @@
   position: fixed;
   overflow-x: auto;
   overflow-y: auto;
-  top: 0;
+  top: 48px;
   left: 0;
 }
 
@@ -34,15 +48,42 @@
   grid-column: 2; /* Fica na primeira coluna */
   grid-row: 1; /* Fica na primeira linha */
   height: 285px;
+  width: 565px;
   margin-left: 10px;
-  margin-top: 160px;
+  margin-top: 0px;
   padding: 0%;
   position: relative;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
+
+.card.lab.lab-moved {
+  transform: translateY(163px);
+}
+
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+.fade-slide-enter-to,
+.fade-slide-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 
 .perks-container {
   height: 188px;
   width: 322px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   border: 2px solid rgb(255, 255, 255);
   border-radius: 2%;
   background-color: #1a1a1a;
@@ -121,9 +162,10 @@ h4{
 
 .card.business{
   grid-column: 1; /* Fica na primeira coluna */
-  grid-row: 1; /* Fica na primeira linha */
+  grid-row: 1;
+  font-size: 14px; /* Fica na primeira linha */
   width: 250px;
-  height: 425px;
+  height: 375px;
   top: 0;
   left: 0;
   justify-content: space-between;
@@ -147,6 +189,7 @@ h4{
   height: 150px;
   margin-left: 10px;
   top: 0px;
+  right: 0px;
   color:#f9f9f9;
   background-color: #213547;
   padding: 10px;

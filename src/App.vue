@@ -1,10 +1,13 @@
 <script setup>
 import { usePaperclipGame } from "./composables/usePaperclipGame.js";
+import PerkCard from "./components/PerkCards.vue";
 import { salesChart } from "./composables/usePaperclipGame.js";
 const { graficoCanvas } = salesChart();
-import { formatPrice } from "./utils/helpers/formatPrice.js";
+import { formatPrice, formatDate, formatNumber } from "./utils/helpers/format.js";
+import { buyPerk, hasMachinery } from "./composables/Perks.js";
 const {
   copperWireinMeter,
+  lifeTimeCopperWire,
   funds,
   priceOfCopper,
   availableCopper,
@@ -29,9 +32,12 @@ const {
 </script>
 
 <template>
+  <div class="top-bar">
+    <div class="totalCopper">Copper Wire made: {{ formatNumber(lifeTimeCopperWire) }}m</div>
+  </div>
   <div class="containers">
     <div class="card business">
-      <h3>Copper wire: {{ copperWireinMeter }} meters</h3>
+      <h3>Stock: {{ copperWireinMeter }} meters</h3>
       <button @click="FabricarPaperclip">Make Copper Wire</button>
 
       <h5>Business</h5>
@@ -48,18 +54,21 @@ const {
       <button @click="buy_refined_copper">Buy Refined Copper</button>
       <p class="mini_info">Price: $9.795</p>
     </div>
-    <div class="card automation">
-      <h3>Automation</h3>
-      <div class="autoinfo">
-        <button @click="buy_worker">Buy worker</button>
-        <p>Price: ${{ formatPrice(workersPrice) }}</p>
-        <p>Amount of workers: {{ workers }}</p>
+    <transition name="fade-slide">
+      <div v-if="hasMachinery" class="card automation">
+        <h3>Automation</h3>
+        <div class="autoinfo">
+          <button @click="buy_worker">Buy worker</button>
+          <p>Price: ${{ formatPrice(workersPrice) }}</p>
+          <p>Amount of workers: {{ workers }}</p>
+        </div>
+        <p class="mini_info">Generates 1 meter of copper per tick(second)</p>
       </div>
-      <p class="mini_info">Generates 1 meter of copper per tick(second)</p>
-    </div>
+    </transition>
     <div class="card terminal">
       <div class="time">
-        📅 Week: {{ week }} | 📆 Month: {{ month }} | 📅 Year: {{ year }}
+        📅 Week: {{ week }} | 📆 Month: {{ formatDate(month) }} | 📅 Year:
+        {{ year }}
       </div>
       <div v-for="(msg, index) in logs" :key="index" class="log-message">
         {{ msg }}
@@ -68,7 +77,7 @@ const {
     <div class="card sellchart">
       <canvas ref="graficoCanvas"></canvas>
     </div>
-    <div class="card lab">
+    <div :class="{ card: true, lab: true, 'lab-moved': hasMachinery }">
       <h4 class="labtitle">Lab Research</h4>
       <div class="marketing-container">
         <div class="marketing-bar">
@@ -84,14 +93,13 @@ const {
         </div>
       </div>
       <div class="perks-container">
-        <div v-if="perks.unlocked.discountPerk" class="perk-box">
-          <p>
-            5% discount on marketing<br />Never leave your marketing level below
-            5%
-          </p>
-          <p>Price: {{ discountPerkPrice }}</p>
-          <button @click="buyDiscountPerk">Buy</button>
-        </div>
+        <PerkCard
+          v-if="!hasMachinery && lifeTimeCopperWire >= 100"
+          perk-id="machinery"
+          title="Garage Factory"
+          description="Automatize the production of copper wire"
+          :price="100.0"
+        />
       </div>
     </div>
   </div>
