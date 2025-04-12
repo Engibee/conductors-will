@@ -290,10 +290,12 @@ export function usePaperclipGame() {
   
     const quantity = Math.floor(Math.random() * (maxBase - minBase + 1)) + minBase;
   
-    if (quantity > 0 && copperWireinMeter.value >= quantity) {
-      copperWireinMeter.value -= quantity;
+    const sellAmount = Math.min(quantity, copperWireinMeter.value);
   
-      const revenue = quantity * priceOfCopper.value;
+    if (sellAmount > 0) {
+      copperWireinMeter.value -= sellAmount;
+  
+      const revenue = sellAmount * priceOfCopper.value;
       funds.value += revenue;
       monthlySale.value += revenue;
     }
