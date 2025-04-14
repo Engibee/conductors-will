@@ -10,7 +10,6 @@
 </template>
 
 <script setup>
-import { defineProps } from "vue";
 import { usePaperclipGame } from '../composables/usePaperclipGame.js'
 import { buyPerk } from "../composables/Perks.js";
 
@@ -20,7 +19,7 @@ const props = defineProps({
   perkId: String,
   title: String,
   description: String,
-  price: Number, // função vinda do componente pai
+  price: Number,
 });
 
 function buy() {

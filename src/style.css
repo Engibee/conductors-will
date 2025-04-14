@@ -82,12 +82,11 @@
   height: 188px;
   width: 322px;
   overflow-y: auto;
-  display: flex;
+  display: grid;
   flex-direction: column;
-  border: 2px solid rgb(255, 255, 255);
   border-radius: 2%;
   background-color: #1a1a1a;
-  padding: 1rem;
+  padding: 0%;
   margin-top: 1rem;
   margin: 2px;
   position: absolute;
@@ -99,10 +98,37 @@ h4{
   color: #4caf50;
 }
 
+.industrial-perks{
+  grid-column: 1;
+  grid-row: 1;
+  width: 161px;
+  height: 94px;
+}
+
+.commodity-perks{
+  grid-column: 1;
+  grid-row: 2;
+  width: 161px;
+  height: 94px;
+}
+
+.marketing-perks{
+  grid-column: 2;
+  grid-row: 1;
+  width: 161px;
+  height: 94px;
+}
+
+.innovation-perks{
+  grid-column: 2;
+  grid-row: 2;
+  width: 161px;
+  height: 94px;
+}
 .perk-box {
-  border: 1px solid rgb(255, 255, 255);
-  padding: 0.5rem;
-  margin-top: 0.5rem;
+  padding: 0px;
+  margin: 0px;
+  font-size: 8px;
 }
 
 .marketing-container {

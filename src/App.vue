@@ -3,8 +3,16 @@ import { usePaperclipGame } from "./composables/usePaperclipGame.js";
 import PerkCard from "./components/PerkCards.vue";
 import { salesChart } from "./composables/usePaperclipGame.js";
 const { graficoCanvas } = salesChart();
-import { formatPrice, formatDate, formatNumber } from "./utils/helpers/format.js";
-import { buyPerk, hasMachinery } from "./composables/Perks.js";
+import {
+  formatPrice,
+  formatDate,
+  formatNumber,
+} from "./utils/helpers/format.js";
+import {
+  buyPerk,
+  hasMachinery,
+  hasContractProvider,
+} from "./composables/Perks.js";
 const {
   copperWireinMeter,
   lifeTimeCopperWire,
@@ -33,7 +41,9 @@ const {
 
 <template>
   <div class="top-bar">
-    <div class="totalCopper">Copper Wire made: {{ formatNumber(lifeTimeCopperWire) }}m</div>
+    <div class="totalCopper">
+      Copper Wire made: {{ formatNumber(lifeTimeCopperWire) }}m
+    </div>
   </div>
   <div class="containers">
     <div class="card business">
@@ -93,13 +103,42 @@ const {
         </div>
       </div>
       <div class="perks-container">
-        <PerkCard
-          v-if="!hasMachinery && lifeTimeCopperWire >= 100"
-          perk-id="machinery"
-          title="Garage Factory"
-          description="Automatize the production of copper wire"
-          :price="100.0"
-        />
+        <div class="industrial-perks">
+          <PerkCard
+            v-if="!hasMachinery && lifeTimeCopperWire >= 0"
+            perk-id="machinery"
+            title="Garage Factory"
+            description="Automatize the production of copper wire."
+            :price="100.0"
+          />
+        </div>
+        <div class="commodity-perks">
+          <PerkCard
+            v-if="!hasContractProvider && lifeTimeCopperWire >= 0"
+            perk-id="contract-provider"
+            title="Contract with a provider"
+            description="Buy commodity in bulks."
+            :price="30.0"
+          />
+        </div>
+        <div class="marketing-perks">
+          <PerkCard
+            v-if="!hasContractProvider && lifeTimeCopperWire >= 0"
+            perk-id="contract-provider"
+            title="Contract with a provider"
+            description="Buy commodity in bulks."
+            :price="30.0"
+          />
+        </div>
+        <div class="innovation-perks">
+          <PerkCard
+            v-if="!hasContractProvider && lifeTimeCopperWire >= 0"
+            perk-id="contract-provider"
+            title="Contract with a provider"
+            description="Buy commodity in bulks."
+            :price="30.0"
+          />
+        </div>
       </div>
     </div>
   </div>

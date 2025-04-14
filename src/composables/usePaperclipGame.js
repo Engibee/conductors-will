@@ -293,6 +293,7 @@ export function usePaperclipGame() {
     const sellAmount = Math.min(quantity, copperWireinMeter.value);
   
     if (sellAmount > 0) {
+      console.log(`Sold products: ${sellAmount}`)
       copperWireinMeter.value -= sellAmount;
   
       const revenue = sellAmount * priceOfCopper.value;
