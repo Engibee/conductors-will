@@ -98,6 +98,20 @@ h4{
   color: #4caf50;
 }
 
+.commodity{
+  display: flex;
+  font-size: 12px;
+  gap: 10px;
+  justify-content: center;
+}
+
+.bulk-button{
+  display: flex;
+  width: 35px;
+  justify-content: center;
+  align-items: center;
+}
+
 .industrial-perks{
   grid-column: 1;
   grid-row: 1;

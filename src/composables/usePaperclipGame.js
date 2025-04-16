@@ -1,38 +1,15 @@
 import { ref, reactive, onMounted, onUnmounted, computed, watch } from "vue";
 import { saveGame, loadGame, clearGame } from "./localStorage";
 import { formatDate } from "../utils/helpers/format.js";
+import * as transaction from "../utils/helpers/transactionHandle.js";
+import { gameState } from "./gameState.js";
 import Chart from "chart.js/auto";
+
+let intervalo = null;
 
 let chartInstance = null;
 let chartLabel = ref([]);
 let chartData = ref([]);
-
- //STOCK HANDLE
- const lifeTimeCopperWire = ref(0);
- const copperWireinMeter = ref(0);
- const availableCopper = ref(10);
- const workers = ref(0);
- export const funds = ref(30);
-
-
- //PRICES HANDLE
- const copperQtPerMeter = 0.02232;
- const kgOfCopper = 9.795;
- const priceOfCopper = ref(0.5);
- const workersPrice = ref(35.0);
- const monthlySale = ref(0);
- const marketing = ref(1);
- const marketingPrice = ref(10);
-
- //TIME HANDLE
- let intervalo = null;
- const ticks = ref(0);
- const week = ref(1);
- const month = ref(1);
- const year = ref(1);
-
- //LISTS
- const logs = ref([]);
 
 export function chartUpdate(newSale, month) {
   //Global reference update
@@ -145,21 +122,21 @@ export function usePaperclipGame() {
     clearGame();
     const data = loadGame();
     if (data) {
-      ticks.value = data.ticks;
-      copperWireinMeter.value = data.copperWireinMeter;
-      lifeTimeCopperWire.value = data.lifeTimeCopperWire;
-      availableCopper.value = data.availableCopper;
-      funds.value = data.funds;
-      priceOfCopper.value = data.priceOfCopper;
-      workers.value = data.workers;
-      workersPrice.value = data.workersPrice;
-      marketing.value = data.marketing;
-      marketingPrice.value = data.marketinPrice;
-      monthlySale.value = data.monthlySale;
-      week.value = data.week;
-      month.value = data.month;
-      year.value = data.year;
-      logs.value = data.logs;
+      gameState.ticks.value = data.ticks;
+      gameState.copperWireinMeter.value = data.copperWireinMeter;
+      gameState.lifeTimeCopperWire.value = data.lifeTimeCopperWire;
+      gameState.availableCopper.value = data.availableCopper;
+      gameState.funds.value = data.funds;
+      gameState.priceOfCopper.value = data.priceOfCopper;
+      gameState.workers.value = data.workers;
+      gameState.workersPrice.value = data.workersPrice;
+      gameState.marketing.value = data.marketing;
+      gameState.marketingPrice.value = data.marketinPrice;
+      gameState.monthlySale.value = data.monthlySale;
+      gameState.week.value = data.week;
+      gameState.month.value = data.month;
+      gameState.year.value = data.year;
+      gameState.logs.value = data.logs;
       chartInstanceUpdateOnly(data.chartData, data.chartLabel);
     }
   });
@@ -170,7 +147,6 @@ export function usePaperclipGame() {
   });
 
   const update_tick = () => {
-    ticks.value++;
     if (ticks_events(10)) {
       time_handler();
     }
@@ -180,166 +156,167 @@ export function usePaperclipGame() {
     if (ticks_events(1)) {
       automation_handler();
       saveGame({
-        ticks: ticks.value,
-        copperWireinMeter: copperWireinMeter.value,
-        lifeTimeCopperWire: lifeTimeCopperWire.value,
-        availableCopper: availableCopper.value,
-        funds: funds.value,
-        priceOfCopper: priceOfCopper.value,
-        workers: workers.value,
-        workersPrice: workersPrice.value,
-        marketing: marketing.value,
-        marketinPrice: marketingPrice.value,
-        monthlySale: monthlySale.value,
-        week: week.value,
-        month: month.value,
-        year: year.value,
-        logs: logs.value,
+        ticks: gameState.ticks.value,
+        copperWireinMeter: gameState.copperWireinMeter.value,
+        lifeTimeCopperWire: gameState.lifeTimeCopperWire.value,
+        availableCopper: gameState.availableCopper.value,
+        funds: gameState.funds.value,
+        priceOfCopper: gameState.priceOfCopper.value,
+        workers: gameState.workers.value,
+        workersPrice: gameState.workersPrice.value,
+        marketing: gameState.marketing.value,
+        marketinPrice: gameState.marketingPrice.value,
+        monthlySale: gameState.monthlySale.value,
+        week: gameState.week.value,
+        month: gameState.month.value,
+        year: gameState.year.value,
+        logs: gameState.logs.value,
         chartLabel: chartLabel.value,
         chartData: chartData.value,
       });
     }
   };
 
-  const perks = reactive({
-    unlocked: {
-      discountPerk: false,
-      autoMarketingPerk: false,
-    },
-    owned: {
-      discountPerk: false,
-      autoMarketingPerk: false,
-    },
-  });
-
   function monthly_sale_graphs_handler() {
-    chartUpdate(monthlySale.value, formatDate(month.value, year.value));
-    monthlySale.value = 0;
+    chartUpdate(
+      gameState.monthlySale.value,
+      formatDate(gameState.month.value, gameState.year.value)
+    );
+    gameState.monthlySale.value = 0;
     logMessage("Receita do mês atualizada!");
   }
   function logMessage(message) {
-    logs.value.push(`[${new Date().toLocaleTimeString()}] ${message}`);
+    gameState.logs.value.push(
+      `[${new Date().toLocaleTimeString()}] ${message}`
+    );
   }
   function automation_handler() {
-    if (availableCopper.value >= copperQtPerMeter * workers.value) {
-      copperWireinMeter.value += 1 * workers.value;
-      lifeTimeCopperWire.value += 1 * workers.value;
-      availableCopper.value -= 1 * workers.value * copperQtPerMeter;
+    if (
+      gameState.availableCopper.value >=
+      gameState.copperQtPerMeter * gameState.workers.value
+    ) {
+      gameState.copperWireinMeter.value += 1 * gameState.workers.value;
+      gameState.lifeTimeCopperWire.value += 1 * gameState.workers.value;
+      gameState.availableCopper.value -=
+        1 * gameState.workers.value * gameState.copperQtPerMeter;
     } else {
       //Nothing yet.
     }
   }
   function buy_refined_copper() {
-    if (funds.value >= kgOfCopper) {
-      availableCopper.value += 1.0;
-      funds.value -= kgOfCopper;
+    transaction.spend(gameState.kgOfCopper * gameState.copperBulkAmount.value)
+      ? (gameState.availableCopper.value +=
+          1.0 * gameState.copperBulkAmount.value)
+      : alert("Not enough funds to buy this amount.");
+  }
+  function increaseBulk() {
+    if (gameState.copperBulkAmount.value < 10) {
+      gameState.copperBulkAmount.value++;
+    }
+  }
+
+  function decreaseBulk() {
+    if (gameState.copperBulkAmount.value >= 2) {
+      gameState.copperBulkAmount.value--;
     }
   }
   function buy_worker() {
-    if (funds.value >= workersPrice.value) {
-      funds.value -= workersPrice.value;
-      workers.value++;
-    }
+    transaction.spend(gameState.workersPrice.value)
+      ? gameState.workers.value++
+      : alert("Not enough funds to hire more workers.");
   }
   function buy_marketing() {
-    if (funds.value >= marketingPrice.value) {
-      marketing.value++;
-      funds.value -= marketingPrice.value;
-      marketingPrice.value = getMarketingPrice(marketing.value);
-    }
+    transaction.spend(gameState.marketingPrice.value)
+      ? gameState.marketing.value++
+      : alert("Not enough funds to invest in marketing.");
+    gameState.marketingPrice.value = getMarketingPrice(
+      gameState.marketing.value
+    );
   }
   function getMarketingPrice(marketingLevel) {
     return Math.floor(10 * Math.pow(marketingLevel, 3));
   }
   function time_handler() {
-    if (month.value == 12 && week.value == 4) {
+    if (gameState.month.value == 12 && gameState.week.value == 4) {
       monthly_sale_graphs_handler();
-      year.value++;
-      month.value = 1;
-      week.value = 1;
-    } else if (week.value == 4) {
+      gameState.year.value++;
+      gameState.month.value = 1;
+      gameState.week.value = 1;
+    } else if (gameState.week.value == 4) {
       monthly_sale_graphs_handler();
-      month.value++;
-      week.value = 1;
+      gameState.month.value++;
+      gameState.week.value = 1;
     } else {
-      week.value++;
+      gameState.week.value++;
     }
   }
   function ticks_events(tick) {
-    return ticks.value % tick === 0;
+    return gameState.ticks.value % tick === 0;
   }
 
   function buy_chance(price, marketing = 0) {
     const priceFactor = Math.exp(-((price - 0.5) / 0.2));
-  
+
     // Exponencial suave com base 1.03, dobra em ~24 níveis
     const marketingFactor = Math.pow(1.03, marketing);
     return priceFactor * marketingFactor;
   }
 
   const currentDemand = computed(() => {
-    return buy_chance(priceOfCopper.value, marketing.value);
+    return buy_chance(gameState.priceOfCopper.value, gameState.marketing.value);
   });
 
   function buy_simulation_per_tick() {
-    const level = marketing.value;
-  
+    const level = gameState.marketing.value;
+
     // Base mínima e máxima ajustadas para dar mais aleatoriedade
     const maxBase = 10 * Math.pow(2, level - 1);
     const minBase = Math.floor(maxBase / 2.5);
-  
-    const quantity = Math.floor(Math.random() * (maxBase - minBase + 1)) + minBase;
-  
-    const sellAmount = Math.min(quantity, copperWireinMeter.value);
-  
+
+    const quantity =
+      Math.floor(Math.random() * (maxBase - minBase + 1)) + minBase;
+
+    const sellAmount = Math.min(quantity, gameState.copperWireinMeter.value);
+
     if (sellAmount > 0) {
-      console.log(`Sold products: ${sellAmount}`)
-      copperWireinMeter.value -= sellAmount;
-  
-      const revenue = sellAmount * priceOfCopper.value;
-      funds.value += revenue;
-      monthlySale.value += revenue;
+      console.log(`Sold products: ${sellAmount}`);
+      gameState.copperWireinMeter.value -= sellAmount;
+
+      const revenue = sellAmount * gameState.priceOfCopper.value;
+      gameState.funds.value += revenue;
+      gameState.monthlySale.value += revenue;
     }
   }
 
-  function FabricarPaperclip() {
-    if (availableCopper.value >= copperQtPerMeter) {
-      availableCopper.value -= copperQtPerMeter;
-      copperWireinMeter.value++;
-      lifeTimeCopperWire.value++;
+  function makeCopperWire() {
+    if (gameState.availableCopper.value >= gameState.copperQtPerMeter) {
+      gameState.availableCopper.value -= gameState.copperQtPerMeter;
+      gameState.copperWireinMeter.value++;
+      gameState.lifeTimeCopperWire.value++;
     }
   }
   function increasePrice() {
-    priceOfCopper.value += 0.01;
+    gameState.priceOfCopper.value += 0.01;
   }
   function decreasePrice() {
-    if (priceOfCopper.value > Number.EPSILON) {
-      priceOfCopper.value -= 0.01;
-      priceOfCopper.value = Math.max(0, priceOfCopper.value);
+    if (gameState.priceOfCopper.value > Number.EPSILON) {
+      gameState.priceOfCopper.value -= 0.01;
+      gameState.priceOfCopper.value = Math.max(
+        0,
+        gameState.priceOfCopper.value
+      );
     }
   }
   return {
-    copperWireinMeter,
-    lifeTimeCopperWire,
-    availableCopper,
-    funds,
-    priceOfCopper,
-    workers,
-    workersPrice,
-    marketing,
-    marketingPrice,
     currentDemand,
-    week,
-    month,
-    year,
-    logs,
-    perks,
-    FabricarPaperclip,
+    makeCopperWire,
     logMessage,
     buy_worker,
     buy_marketing,
     buy_refined_copper,
     increasePrice,
     decreasePrice,
+    increaseBulk,
+    decreaseBulk,
   };
 }

@@ -1,13 +1,11 @@
 import { ref, reactive, onMounted, onUnmounted, computed, watch } from "vue";
-
-export const hasMachinery = ref(false);
-export const hasContractProvider = ref(false);
+import { perkState } from "./gameState";
 
 export function buyPerk(perk) {
   if (perk === "machinery") {
-    hasMachinery.value = true;
+    perkState.hasMachinery.value = true;
   }
   if (perk === "contract-provider") {
-    hasContractProvider.value = true;
+    perkState.hasContractProvider.value = true;
   }
 }
