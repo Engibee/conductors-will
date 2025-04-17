@@ -4,6 +4,7 @@ import { gameState, perkState } from "./composables/gameState.js";
 import { salesChart } from "./composables/usePaperclipGame.js";
 import PerkCard from "./components/PerkCards.vue";
 import TickHandler from "./components/TickHandler.vue";
+import WorldMap from "./components/WorldMap.vue";
 const { graficoCanvas } = salesChart();
 import {
   formatPrice,
@@ -151,6 +152,10 @@ const {
         <div class="innovation-perks"></div>
       </div>
     </div>
+    <div class="world-map-container">
+      <WorldMap />
+    </div>
+    <div class="world-map-info"></div>
   </div>
 </template>
 

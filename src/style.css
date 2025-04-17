@@ -27,7 +27,7 @@
   background-color: #1a2b3c; /* ou algo consistente com seu tema */
   width: 100%;
 }
-.containers{
+.containers {
   display: grid;
   gap: 0px;
   padding: 10px;
@@ -38,13 +38,13 @@
   left: 0;
 }
 
-.card{
-  color:#f9f9f9;
+.card {
+  color: #f9f9f9;
   background-color: #213547;
   border-radius: 2%;
 }
 
-.card.lab{
+.card.lab {
   grid-column: 2; /* Fica na primeira coluna */
   grid-row: 1; /* Fica na primeira linha */
   height: 285px;
@@ -77,7 +77,6 @@
   transform: translateY(0);
 }
 
-
 .perks-container {
   height: 188px;
   width: 322px;
@@ -94,46 +93,75 @@
   right: 0;
 }
 
-h4{
+h4 {
   color: #4caf50;
 }
 
-.commodity{
+.commodity {
   display: flex;
   font-size: 12px;
   gap: 10px;
   justify-content: center;
 }
 
-.bulk-button{
+.world-map-info {
+  grid-column: 3;
+  grid-row: 2;
+  background-color: #213547;
+  color: white;
+  margin-left: 10px;
+  margin-top: 10px;
+  border-radius: 10px;
+}
+
+.world-map-container {
+  grid-column: 3;
+  grid-row: 1;
+  margin-top: 180px;
+  height: 215px;
+  width: 405px;
+  background-color: #93defe;
+  border-radius: 10px;
+  padding: 0px;
+  margin-left: 10px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  overflow: hidden;
+}
+
+.bulk-button {
   display: flex;
   width: 35px;
   justify-content: center;
   align-items: center;
 }
 
-.industrial-perks{
+.industrial-perks {
   grid-column: 1;
   grid-row: 1;
   width: 161px;
   height: 94px;
 }
 
-.commodity-perks{
+.commodity-perks {
   grid-column: 1;
   grid-row: 2;
   width: 161px;
   height: 94px;
 }
 
-.marketing-perks{
+.marketing-perks {
   grid-column: 2;
   grid-row: 1;
   width: 161px;
   height: 94px;
 }
 
-.innovation-perks{
+.innovation-perks {
   grid-column: 2;
   grid-row: 2;
   width: 161px;
@@ -177,30 +205,30 @@ h4{
   margin-left: 10px; /* espaço entre barra e info */
 }
 
-.card.sellchart{
+.card.sellchart {
   margin-top: 10px;
   width: 269px;
   height: 114px;
   padding: 0;
 }
 
-.card.automation{
+.card.automation {
   grid-column: 2; /* Fica na primeira coluna */
   grid-row: 1; /* Fica na primeira linha */
   width: 500px;
   height: 120px;
   margin-left: 10px;
-  text-align:justify;
+  text-align: justify;
   padding-top: 0;
   line-height: 1;
 }
 
-.autoinfo{
+.autoinfo {
   display: flex;
   gap: 50px;
 }
 
-.card.business{
+.card.business {
   grid-column: 1; /* Fica na primeira coluna */
   grid-row: 1;
   font-size: 14px; /* Fica na primeira linha */
@@ -212,13 +240,13 @@ h4{
   padding: 10px; /* Espaço interno para afastar a borda do texto */
 }
 
-.sellprice{
+.sellprice {
   display: flex;
   gap: 10px;
   align-items: center;
 }
 
-.mini_info{
+.mini_info {
   font-size: 12px;
 }
 
@@ -230,7 +258,7 @@ h4{
   margin-left: 10px;
   top: 0px;
   right: 0px;
-  color:#f9f9f9;
+  color: #f9f9f9;
   background-color: #213547;
   padding: 10px;
   overflow-y: auto;

@@ -3,7 +3,7 @@ import { ref, reactive, onMounted, onUnmounted, computed, watch } from "vue";
 //STOCK HANDLE
 export const gameState = {
   //STOCK HANDLE
-  funds: ref(30),
+  funds: ref(150),
   lifeTimeCopperWire: ref(0),
   copperWireinMeter: ref(0),
   availableCopper: ref(10),
