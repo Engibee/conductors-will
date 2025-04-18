@@ -1,120 +1,19 @@
-import { ref, reactive, onMounted, onUnmounted, computed, watch, toRaw } from "vue";
+import {
+  ref,
+  reactive,
+  onMounted,
+  onUnmounted,
+  computed,
+  watch,
+  toRaw,
+} from "vue";
 import { saveGame, loadGame, clearGame } from "./localStorage";
 import { formatDate } from "../utils/helpers/format.js";
 import * as transaction from "../utils/helpers/transactionHandle.js";
-import { gameState,perkState,selectedContinent } from "./gameState.js";
-import Chart from "chart.js/auto";
+import { gameState, perkState, selectedContinent, chart } from "./gameState.js";
 
 let intervalo = null;
 
-let chartInstance = null;
-let chartLabel = ref([]);
-let chartData = ref([]);
-
-export function chartUpdate(newSale, month) {
-  //Global reference update
-  chartLabel.value.push(month);
-  chartData.value.push(newSale);
-
-  //Instance update
-  if (!chartInstance) return;
-  chartInstance.data.labels.push(month); // mês
-  chartInstance.data.datasets[0].data.push(newSale);
-  chartInstance.update();
-}
-
-export function chartInstanceUpdateOnly(newSale, month) {
-  //Instance update
-  if (!chartInstance) return;
-  chartInstance.data.labels.push(...month); // mês
-  chartInstance.data.datasets[0].data.push(...newSale);
-  chartInstance.update();
-}
-
-export function salesChart(canvasElement) {
-  const graficoCanvas = ref(null); // vai ser usado no <canvas ref="">
-
-  const criarGrafico = () => {
-    if (!graficoCanvas.value) {
-      console.warn("Canvas não está pronto ainda.");
-      return;
-    }
-
-    if (chartInstance) {
-      chartInstance.destroy();
-    }
-
-    chartInstance = new Chart(graficoCanvas.value, {
-      type: "line",
-      data: {
-        labels: [],
-        datasets: [
-          {
-            label: "Vendas por mês",
-            data: [],
-            borderColor: "white",
-            backgroundColor: "lightblue",
-            tension: 0.4,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: {
-          padding: {
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-          },
-        },
-        plugins: {
-          legend: {
-            display: false, // remove o "Vendas"
-          },
-          tooltip: {
-            enabled: true, // remove o balãozinho ao passar o mouse
-          },
-          zoom: {
-            pan: {
-              enabled: true,
-              mode: "x", // ou 'y', ou 'xy'
-            },
-            zoom: {
-              wheel: {
-                enabled: true, // Habilita zoom com a roda do mouse
-              },
-              pinch: {
-                enabled: true, // Habilita zoom com gesto de pinça (mobile)
-              },
-              mode: "x",
-            },
-          },
-        },
-        scales: {
-          x: {
-            display: true,
-            ticks: { color: "white" },
-          },
-          y: {
-            display: true,
-            ticks: { color: "white", beginAtZero: true },
-          },
-        },
-      },
-    });
-  };
-
-  onMounted(() => {
-    criarGrafico();
-  });
-
-  return {
-    graficoCanvas,
-    criarGrafico, // caso queira chamar de novo depois (ex: para atualizar)
-  };
-}
 export function usePaperclipGame() {
   onMounted(() => {
     intervalo = setInterval(update_tick, 1000);
@@ -124,7 +23,7 @@ export function usePaperclipGame() {
       Object.assign(gameState, data.state);
       Object.assign(perkState, data.perkState);
       Object.assign(selectedContinent, data.selectedContinent);
-      chartInstanceUpdateOnly(data.chartData, data.chartLabel);
+      Object.assign(chart, data.chartInstance);
     }
   });
   onUnmounted(() => {
@@ -146,11 +45,17 @@ export function usePaperclipGame() {
         state: toRaw(gameState),
         perkState: toRaw(perkState),
         selectedContinent: toRaw(selectedContinent),
-        chartLabel: chartLabel.value,
-        chartData: chartData.value,
+        chartInstance: toRaw(chart),
       });
     }
   };
+
+  function chartUpdate(newSale, month) {
+    chart.chartLabel.push(month);
+    console.log("chartLabel", chart.chartLabel);
+    chart.chartData.push(newSale);
+    console.log("chartData", chart.chartData);
+  }
 
   function monthly_sale_graphs_handler() {
     chartUpdate(
@@ -161,9 +66,7 @@ export function usePaperclipGame() {
     logMessage("Monthly receipt updated!");
   }
   function logMessage(message) {
-    gameState.logs.push(
-      `[${new Date().toLocaleTimeString()}] ${message}`
-    );
+    gameState.logs.push(`[${new Date().toLocaleTimeString()}] ${message}`);
   }
   function automation_handler() {
     if (
@@ -180,8 +83,7 @@ export function usePaperclipGame() {
   }
   function buy_refined_copper() {
     transaction.spend(gameState.kgOfCopper * gameState.copperBulkAmount)
-      ? (gameState.availableCopper +=
-          1.0 * gameState.copperBulkAmount)
+      ? (gameState.availableCopper += 1.0 * gameState.copperBulkAmount)
       : alert("Not enough funds to buy this amount.");
   }
   function increaseBulk() {
@@ -204,9 +106,7 @@ export function usePaperclipGame() {
     transaction.spend(gameState.marketingPrice)
       ? gameState.marketing++
       : alert("Not enough funds to invest in marketing.");
-    gameState.marketingPrice = getMarketingPrice(
-      gameState.marketing
-    );
+    gameState.marketingPrice = getMarketingPrice(gameState.marketing);
   }
   function getMarketingPrice(marketingLevel) {
     return Math.floor(10 * Math.pow(marketingLevel, 3));
@@ -276,10 +176,7 @@ export function usePaperclipGame() {
   function decreasePrice() {
     if (gameState.priceOfCopper > Number.EPSILON) {
       gameState.priceOfCopper -= 0.01;
-      gameState.priceOfCopper = Math.max(
-        0,
-        gameState.priceOfCopper
-      );
+      gameState.priceOfCopper = Math.max(0, gameState.priceOfCopper);
     }
   }
   return {

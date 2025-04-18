@@ -1,15 +1,13 @@
 <script setup>
 import { usePaperclipGame } from "./composables/usePaperclipGame.js";
-import { gameState, perkState, selectedContinent } from "./composables/gameState.js";
-import { salesChart } from "./composables/usePaperclipGame.js";
+import { gameState, perkState, selectedContinent, chart } from "./composables/gameState.js";
 import PerkCard from "./components/PerkCards.vue";
 import TickHandler from "./components/TickHandler.vue";
 import WorldMap from "./components/WorldMap.vue";
-const { graficoCanvas } = salesChart();
+import GameChart from './components/SellChart.vue';
 import {
   formatPrice,
   formatDate,
-  formatNumber,
 } from "./utils/helpers/format.js";
 const {
   currentDemand,
@@ -100,7 +98,7 @@ const {
       </div>
     </div>
     <div class="card sellchart">
-      <canvas ref="graficoCanvas"></canvas>
+      <GameChart :labels="chart.chartLabel" :data="chart.chartData" />
     </div>
     <div
       :class="{

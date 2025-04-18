@@ -30,6 +30,11 @@ export const gameState = reactive({
   logs: [],
 });
 
+export const chart = reactive({
+  chartLabel: [],
+  chartData: [],
+});
+
 export const perkState = reactive({
   hasMachinery: false,
   hasContractProvider: false,
