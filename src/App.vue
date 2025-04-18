@@ -75,7 +75,7 @@ const {
       </p>
     </div>
     <transition name="fade-slide">
-      <div v-if="perkState.hasMachinery.value" class="card automation">
+      <div v-if="perkState.hasMachinery" class="card automation">
         <h3>Automation</h3>
         <div class="autoinfo">
           <button @click="buy_worker">Buy worker</button>

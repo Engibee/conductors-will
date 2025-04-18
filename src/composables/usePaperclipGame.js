@@ -119,7 +119,6 @@ export function usePaperclipGame() {
   onMounted(() => {
     intervalo = setInterval(update_tick, 1000);
     console.log(`O contador foi montado.`);
-    clearGame();
     const data = loadGame();
     if (data) {
       Object.assign(gameState, data.state);
@@ -162,7 +161,7 @@ export function usePaperclipGame() {
     logMessage("Monthly receipt updated!");
   }
   function logMessage(message) {
-    gameState.logs.value.push(
+    gameState.logs.push(
       `[${new Date().toLocaleTimeString()}] ${message}`
     );
   }
