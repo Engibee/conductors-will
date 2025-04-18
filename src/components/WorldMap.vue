@@ -1,7 +1,5 @@
 <template>
-  <div class="world-map-inner">
-    <object type="image/svg+xml" :data="worldMapUrl" class="world-map" />
-  </div>
+  <div class="world-map-inner" v-html="worldMapUrl" @click="handleClick"></div>
 </template>
 
 <style scoped>
@@ -24,6 +22,22 @@
 </style>
 
 <script setup>
-import worldMap from "../assets/world-map.svg";
+import worldMap from '../assets/world-map.svg?raw';
+import { selectedContinent } from '../composables/gameState.js';
+
 const worldMapUrl = worldMap;
+
+const handleClick = (event) => {
+  let clickedElement = event.target;
+
+  if (clickedElement.tagName === 'path') {
+    if (clickedElement.id) {
+    }
+    else if (clickedElement.parentNode?.id) {
+      console.log("Continent:", clickedElement.parentNode.id);
+      selectedContinent.name = clickedElement.parentNode.id;
+    }
+  }
+};
+
 </script>

@@ -105,6 +105,7 @@ h4 {
 }
 
 .world-map-info {
+  display: flex;
   grid-column: 3;
   grid-row: 2;
   background-color: #213547;
@@ -283,6 +284,26 @@ h4 {
   font-size: 14px;
 }
 
+.real-state{
+  width: 202.5px;
+  height: 114px;
+  border-color: #4caf50;
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.stakeholding{
+  width: 202.5px;
+  height: 114px;
+  border-color: #4caf50;
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -296,6 +317,7 @@ body {
   margin: 0;
   display: flex;
   place-items: center;
+  overflow-y: auto;
   min-width: 320px;
   min-height: 100vh;
 }

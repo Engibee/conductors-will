@@ -1,6 +1,6 @@
 <script setup>
 import { usePaperclipGame } from "./composables/usePaperclipGame.js";
-import { gameState, perkState } from "./composables/gameState.js";
+import { gameState, perkState, selectedContinent } from "./composables/gameState.js";
 import { salesChart } from "./composables/usePaperclipGame.js";
 import PerkCard from "./components/PerkCards.vue";
 import TickHandler from "./components/TickHandler.vue";
@@ -28,7 +28,7 @@ const {
   <TickHandler />
   <div class="top-bar">
     <div class="totalCopper">
-      Copper Wire made: {{ formatNumber(gameState.lifeTimeCopperWire.value) }}m
+      Copper Wire made: {{ gameState.lifeTimeCopperWire.toLocaleString() }}m
     </div>
   </div>
   <div class="containers">
@@ -37,31 +37,31 @@ const {
       <button @click="makeCopperWire">Make Copper Wire</button>
 
       <h5>Business</h5>
-      <p>Funds: ${{ formatPrice(gameState.funds.value) }}</p>
+      <p>💵Funds: ${{ formatPrice(gameState.funds) }}</p>
       <p class="sellprice">
         <button @click="decreasePrice" class="small-btn">-</button>
         <button @click="increasePrice" class="small-btn">+</button>
-        Selling price: ${{ formatPrice(gameState.priceOfCopper.value) }}
+        Selling price: ${{ formatPrice(gameState.priceOfCopper) }}
       </p>
       <p>
         Demand: <strong>{{ formatPrice(currentDemand) }}</strong>
       </p>
       <p>
-        Refined Copper: {{ formatPrice(gameState.availableCopper.value) }} kg
+        Refined Copper: {{ formatPrice(gameState.availableCopper) }} kg
       </p>
       <div class="commodity">
         <button
-          v-if="perkState.hasContractProvider.value"
+          v-if="perkState.hasContractProvider"
           @click="decreaseBulk"
           class="bulk-button"
         >
           -
         </button>
         <button @click="buy_refined_copper">
-          Buy Ref. Copper x {{ gameState.copperBulkAmount.value }}
+          Buy Ref. Copper x {{ gameState.copperBulkAmount }}
         </button>
         <button
-          v-if="perkState.hasContractProvider.value"
+          v-if="perkState.hasContractProvider"
           @click="increaseBulk"
           class="bulk-button"
         >
@@ -70,7 +70,7 @@ const {
       </div>
       <p class="mini_info">
         Price: ${{
-          formatPrice(gameState.kgOfCopper * gameState.copperBulkAmount.value)
+          formatPrice(gameState.kgOfCopper * gameState.copperBulkAmount)
         }}
       </p>
     </div>
@@ -79,7 +79,7 @@ const {
         <h3>Automation</h3>
         <div class="autoinfo">
           <button @click="buy_worker">Buy worker</button>
-          <p>Price: ${{ formatPrice(gameState.workersPrice.value) }}</p>
+          <p>Price: ${{ formatPrice(gameState.workersPrice) }}</p>
           <p>Amount of workers: {{ gameState.workers }}</p>
         </div>
         <p class="mini_info">Generates 1 meter of copper per tick(second)</p>
@@ -88,11 +88,11 @@ const {
     <div class="card terminal">
       <div class="time">
         📅 Week: {{ gameState.week }} | 📆 Month:
-        {{ formatDate(gameState.month.value) }} | 📅 Year:
+        {{ formatDate(gameState.month) }} | 📅 Year:
         {{ gameState.year }}
       </div>
       <div
-        v-for="(msg, index) in gameState.logs.value"
+        v-for="(msg, index) in gameState.logs"
         :key="index"
         class="log-message"
       >
@@ -106,7 +106,7 @@ const {
       :class="{
         card: true,
         lab: true,
-        'lab-moved': perkState.hasMachinery.value,
+        'lab-moved': perkState.hasMachinery,
       }"
     >
       <h4 class="labtitle">Lab Research</h4>
@@ -114,33 +114,43 @@ const {
         <div class="marketing-bar">
           <div
             class="marketing-fill"
-            :style="{ height: gameState.marketing.value + '%' }"
+            :style="{ height: gameState.marketing + '%' }"
           ></div>
         </div>
         <div class="marketing-info">
           <p>Marketing: {{ gameState.marketing }}%</p>
           <button @click="buy_marketing">Buy</button>
-          <p>Price: ${{ formatPrice(gameState.marketingPrice.value) }}</p>
+          <p>Price: ${{ formatPrice(gameState.marketingPrice) }}</p>
         </div>
       </div>
       <div class="perks-container">
         <div class="industrial-perks">
           <PerkCard
             v-if="
-              !perkState.hasMachinery.value &&
-              gameState.lifeTimeCopperWire.value >= 0
+              !perkState.hasMachinery &&
+              gameState.lifeTimeCopperWire >= 0
             "
             perk-id="machinery"
             title="Garage Factory"
             description="Automatize the production of copper wire."
             :price="100.0"
           />
+          <PerkCard
+            v-if="
+              perkState.hasMachinery &&
+              gameState.lifeTimeCopperWire >= 0
+            "
+            perk-id="real-state"
+            title="Invest in Real State"
+            description="Buy buildings for a bigger production."
+            :price="1000.0"
+          />
         </div>
         <div class="commodity-perks">
           <PerkCard
             v-if="
-              !perkState.hasContractProvider.value &&
-              gameState.lifeTimeCopperWire.value >= 0
+              !perkState.hasContractProvider &&
+              gameState.lifeTimeCopperWire >= 0
             "
             perk-id="contract-provider"
             title="Contract with a provider"
@@ -155,7 +165,14 @@ const {
     <div class="world-map-container">
       <WorldMap />
     </div>
-    <div class="world-map-info"></div>
+    <div class="world-map-info">
+      <div class="real-state">
+        {{ selectedContinent.name.replace("-", " ") }}
+      </div>
+      <div class="stakeholding">
+        {{ selectedContinent.name.replace("-", " ") }}
+      </div>
+    </div>
   </div>
 </template>
 

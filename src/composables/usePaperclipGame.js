@@ -1,8 +1,8 @@
-import { ref, reactive, onMounted, onUnmounted, computed, watch } from "vue";
+import { ref, reactive, onMounted, onUnmounted, computed, watch, toRaw } from "vue";
 import { saveGame, loadGame, clearGame } from "./localStorage";
 import { formatDate } from "../utils/helpers/format.js";
 import * as transaction from "../utils/helpers/transactionHandle.js";
-import { gameState } from "./gameState.js";
+import { gameState,perkState,selectedContinent } from "./gameState.js";
 import Chart from "chart.js/auto";
 
 let intervalo = null;
@@ -122,21 +122,9 @@ export function usePaperclipGame() {
     clearGame();
     const data = loadGame();
     if (data) {
-      gameState.ticks.value = data.ticks;
-      gameState.copperWireinMeter.value = data.copperWireinMeter;
-      gameState.lifeTimeCopperWire.value = data.lifeTimeCopperWire;
-      gameState.availableCopper.value = data.availableCopper;
-      gameState.funds.value = data.funds;
-      gameState.priceOfCopper.value = data.priceOfCopper;
-      gameState.workers.value = data.workers;
-      gameState.workersPrice.value = data.workersPrice;
-      gameState.marketing.value = data.marketing;
-      gameState.marketingPrice.value = data.marketinPrice;
-      gameState.monthlySale.value = data.monthlySale;
-      gameState.week.value = data.week;
-      gameState.month.value = data.month;
-      gameState.year.value = data.year;
-      gameState.logs.value = data.logs;
+      Object.assign(gameState, data.state);
+      Object.assign(perkState, data.perkState);
+      Object.assign(selectedContinent, data.selectedContinent);
       chartInstanceUpdateOnly(data.chartData, data.chartLabel);
     }
   });
@@ -156,21 +144,9 @@ export function usePaperclipGame() {
     if (ticks_events(1)) {
       automation_handler();
       saveGame({
-        ticks: gameState.ticks.value,
-        copperWireinMeter: gameState.copperWireinMeter.value,
-        lifeTimeCopperWire: gameState.lifeTimeCopperWire.value,
-        availableCopper: gameState.availableCopper.value,
-        funds: gameState.funds.value,
-        priceOfCopper: gameState.priceOfCopper.value,
-        workers: gameState.workers.value,
-        workersPrice: gameState.workersPrice.value,
-        marketing: gameState.marketing.value,
-        marketinPrice: gameState.marketingPrice.value,
-        monthlySale: gameState.monthlySale.value,
-        week: gameState.week.value,
-        month: gameState.month.value,
-        year: gameState.year.value,
-        logs: gameState.logs.value,
+        state: toRaw(gameState),
+        perkState: toRaw(perkState),
+        selectedContinent: toRaw(selectedContinent),
         chartLabel: chartLabel.value,
         chartData: chartData.value,
       });
@@ -179,11 +155,11 @@ export function usePaperclipGame() {
 
   function monthly_sale_graphs_handler() {
     chartUpdate(
-      gameState.monthlySale.value,
-      formatDate(gameState.month.value, gameState.year.value)
+      gameState.monthlySale,
+      formatDate(gameState.month, gameState.year)
     );
-    gameState.monthlySale.value = 0;
-    logMessage("Receita do mês atualizada!");
+    gameState.monthlySale = 0;
+    logMessage("Monthly receipt updated!");
   }
   function logMessage(message) {
     gameState.logs.value.push(
@@ -192,66 +168,66 @@ export function usePaperclipGame() {
   }
   function automation_handler() {
     if (
-      gameState.availableCopper.value >=
-      gameState.copperQtPerMeter * gameState.workers.value
+      gameState.availableCopper >=
+      gameState.copperQtPerMeter * gameState.workers
     ) {
-      gameState.copperWireinMeter.value += 1 * gameState.workers.value;
-      gameState.lifeTimeCopperWire.value += 1 * gameState.workers.value;
-      gameState.availableCopper.value -=
-        1 * gameState.workers.value * gameState.copperQtPerMeter;
+      gameState.copperWireinMeter += 1 * gameState.workers;
+      gameState.lifeTimeCopperWire += 1 * gameState.workers;
+      gameState.availableCopper -=
+        1 * gameState.workers * gameState.copperQtPerMeter;
     } else {
       //Nothing yet.
     }
   }
   function buy_refined_copper() {
-    transaction.spend(gameState.kgOfCopper * gameState.copperBulkAmount.value)
-      ? (gameState.availableCopper.value +=
-          1.0 * gameState.copperBulkAmount.value)
+    transaction.spend(gameState.kgOfCopper * gameState.copperBulkAmount)
+      ? (gameState.availableCopper +=
+          1.0 * gameState.copperBulkAmount)
       : alert("Not enough funds to buy this amount.");
   }
   function increaseBulk() {
-    if (gameState.copperBulkAmount.value < 10) {
-      gameState.copperBulkAmount.value++;
+    if (gameState.copperBulkAmount < 10) {
+      gameState.copperBulkAmount++;
     }
   }
 
   function decreaseBulk() {
-    if (gameState.copperBulkAmount.value >= 2) {
-      gameState.copperBulkAmount.value--;
+    if (gameState.copperBulkAmount >= 2) {
+      gameState.copperBulkAmount--;
     }
   }
   function buy_worker() {
-    transaction.spend(gameState.workersPrice.value)
-      ? gameState.workers.value++
+    transaction.spend(gameState.workersPrice)
+      ? gameState.workers++
       : alert("Not enough funds to hire more workers.");
   }
   function buy_marketing() {
-    transaction.spend(gameState.marketingPrice.value)
-      ? gameState.marketing.value++
+    transaction.spend(gameState.marketingPrice)
+      ? gameState.marketing++
       : alert("Not enough funds to invest in marketing.");
-    gameState.marketingPrice.value = getMarketingPrice(
-      gameState.marketing.value
+    gameState.marketingPrice = getMarketingPrice(
+      gameState.marketing
     );
   }
   function getMarketingPrice(marketingLevel) {
     return Math.floor(10 * Math.pow(marketingLevel, 3));
   }
   function time_handler() {
-    if (gameState.month.value == 12 && gameState.week.value == 4) {
+    if (gameState.month == 12 && gameState.week == 4) {
       monthly_sale_graphs_handler();
-      gameState.year.value++;
-      gameState.month.value = 1;
-      gameState.week.value = 1;
-    } else if (gameState.week.value == 4) {
+      gameState.year++;
+      gameState.month = 1;
+      gameState.week = 1;
+    } else if (gameState.week == 4) {
       monthly_sale_graphs_handler();
-      gameState.month.value++;
-      gameState.week.value = 1;
+      gameState.month++;
+      gameState.week = 1;
     } else {
-      gameState.week.value++;
+      gameState.week++;
     }
   }
   function ticks_events(tick) {
-    return gameState.ticks.value % tick === 0;
+    return gameState.ticks % tick === 0;
   }
 
   function buy_chance(price, marketing = 0) {
@@ -263,11 +239,11 @@ export function usePaperclipGame() {
   }
 
   const currentDemand = computed(() => {
-    return buy_chance(gameState.priceOfCopper.value, gameState.marketing.value);
+    return buy_chance(gameState.priceOfCopper, gameState.marketing);
   });
 
   function buy_simulation_per_tick() {
-    const level = gameState.marketing.value;
+    const level = gameState.marketing;
 
     // Base mínima e máxima ajustadas para dar mais aleatoriedade
     const maxBase = 10 * Math.pow(2, level - 1);
@@ -276,34 +252,34 @@ export function usePaperclipGame() {
     const quantity =
       Math.floor(Math.random() * (maxBase - minBase + 1)) + minBase;
 
-    const sellAmount = Math.min(quantity, gameState.copperWireinMeter.value);
+    const sellAmount = Math.min(quantity, gameState.copperWireinMeter);
 
     if (sellAmount > 0) {
       console.log(`Sold products: ${sellAmount}`);
-      gameState.copperWireinMeter.value -= sellAmount;
+      gameState.copperWireinMeter -= sellAmount;
 
-      const revenue = sellAmount * gameState.priceOfCopper.value;
-      gameState.funds.value += revenue;
-      gameState.monthlySale.value += revenue;
+      const revenue = sellAmount * gameState.priceOfCopper;
+      gameState.funds += revenue;
+      gameState.monthlySale += revenue;
     }
   }
 
   function makeCopperWire() {
-    if (gameState.availableCopper.value >= gameState.copperQtPerMeter) {
-      gameState.availableCopper.value -= gameState.copperQtPerMeter;
-      gameState.copperWireinMeter.value++;
-      gameState.lifeTimeCopperWire.value++;
+    if (gameState.availableCopper >= gameState.copperQtPerMeter) {
+      gameState.availableCopper -= gameState.copperQtPerMeter;
+      gameState.copperWireinMeter++;
+      gameState.lifeTimeCopperWire++;
     }
   }
   function increasePrice() {
-    gameState.priceOfCopper.value += 0.01;
+    gameState.priceOfCopper += 0.01;
   }
   function decreasePrice() {
-    if (gameState.priceOfCopper.value > Number.EPSILON) {
-      gameState.priceOfCopper.value -= 0.01;
-      gameState.priceOfCopper.value = Math.max(
+    if (gameState.priceOfCopper > Number.EPSILON) {
+      gameState.priceOfCopper -= 0.01;
+      gameState.priceOfCopper = Math.max(
         0,
-        gameState.priceOfCopper.value
+        gameState.priceOfCopper
       );
     }
   }

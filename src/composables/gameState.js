@@ -1,36 +1,41 @@
 import { ref, reactive, onMounted, onUnmounted, computed, watch } from "vue";
 
 //STOCK HANDLE
-export const gameState = {
+export const gameState = reactive({
   //STOCK HANDLE
-  funds: ref(150),
-  lifeTimeCopperWire: ref(0),
-  copperWireinMeter: ref(0),
-  availableCopper: ref(10),
-  workers: ref(0),
+  funds: 150,
+  lifeTimeCopperWire: 0,
+  copperWireinMeter: 0,
+  availableCopper: 10,
+  workers: 0,
 
   //PRICES HANDLE
   copperQtPerMeter: 0.02232,
   kgOfCopper: 9.795,
-  copperBulkAmount: ref(1),
-  priceOfCopper: ref(0.5),
-  workersPrice: ref(35.0),
-  monthlySale: ref(0),
-  marketing: ref(1),
-  marketingPrice: ref(10),
+  copperBulkAmount: 1,
+  priceOfCopper: 0.5,
+  workersPrice: 35.0,
+  monthlySale: 0,
+  marketing: 1,
+  marketingPrice: 10,
 
   //TIME HANDLE
   intervalo: null,
-  ticks: ref(0),
-  week: ref(1),
-  month: ref(1),
-  year: ref(1),
+  ticks: 0,
+  week: 1,
+  month: 1,
+  year: 1,
 
   //LISTS
-  logs: ref([]),
-};
+  logs: [],
+});
 
-export const perkState = {
-  hasMachinery: ref(false),
-  hasContractProvider: ref(false),
-}
+export const perkState = reactive({
+  hasMachinery: false,
+  hasContractProvider: false,
+  hasRealState: false,
+});
+
+export const selectedContinent = reactive({
+  name: "No continent selected",
+});
