@@ -3,7 +3,7 @@ import { ref, reactive, onMounted, onUnmounted, computed, watch } from "vue";
 //STOCK HANDLE
 export const gameState = reactive({
   //STOCK HANDLE
-  funds: 150,
+  funds: 2000,
   lifeTimeCopperWire: 0,
   copperWireinMeter: 0,
   availableCopper: 10,
@@ -18,6 +18,13 @@ export const gameState = reactive({
   monthlySale: 0,
   marketing: 1,
   marketingPrice: 10,
+  demandModifier: 1,
+  maxSaleModifier: 1,
+
+  //REAL ESTATE HANDLE
+  availableBuildings: 0,
+  factories: 0,
+  rentedBuilding:0,
 
   //TIME HANDLE
   intervalo: null,
@@ -30,6 +37,45 @@ export const gameState = reactive({
   logs: [],
 });
 
+export const continentRealEstate = reactive({
+  Asia: {
+    availableBuildings: 0,
+    factories: 0,
+    rentedBuildings: 0,
+    license: false,
+  },
+  Europe: {
+    availableBuildings: 0,
+    factories: 0,
+    rentedBuildings: 0,
+    license: false,
+  },
+  NorthAmerica: {
+    availableBuildings: 0,
+    factories: 0,
+    rentedBuildings: 0,
+    license: true,
+  },
+  SouthAmerica: {
+    availableBuildings: 0,
+    factories: 0,
+    rentedBuildings: 0,
+    license: false,
+  },
+  Africa: {
+    availableBuildings: 0,
+    factories: 0,
+    rentedBuildings: 0,
+    license: false,
+  },
+  Oceania: {
+    availableBuildings: 0,
+    factories: 0,
+    rentedBuildings: 0,
+    license: false,
+  },
+});
+
 export const chart = reactive({
   chartLabel: [],
   chartData: [],
@@ -39,6 +85,7 @@ export const perkState = reactive({
   hasMachinery: false,
   hasContractProvider: false,
   hasRealState: false,
+  hasPatentLogo: false,
 });
 
 export const selectedContinent = reactive({

@@ -31,11 +31,21 @@ const handleClick = (event) => {
   let clickedElement = event.target;
 
   if (clickedElement.tagName === 'path') {
-    if (clickedElement.id) {
-    }
-    else if (clickedElement.parentNode?.id) {
-      console.log("Continent:", clickedElement.parentNode.id);
-      selectedContinent.name = clickedElement.parentNode.id;
+    // Checamos se o elemento pai tem um ID (ou seja, é um grupo de continente)
+    const group = clickedElement.closest('g[id]');
+
+    if (group) {
+      // Define o continente selecionado
+      console.log("Continent:", group.id);
+      selectedContinent.name = group.id;
+
+      // Resetando cor de todos os grupos (opcional)
+      document.querySelectorAll('svg g[id]').forEach(g => {
+        g.querySelectorAll('path').forEach(p => p.setAttribute('fill', '#080404'));
+      });
+
+      // Aplicando a nova cor ao grupo clicado
+      group.querySelectorAll('path').forEach(p => p.setAttribute('fill', 'red'));
     }
   }
 };

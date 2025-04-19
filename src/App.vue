@@ -1,14 +1,17 @@
 <script setup>
 import { usePaperclipGame } from "./composables/usePaperclipGame.js";
-import { gameState, perkState, selectedContinent, chart } from "./composables/gameState.js";
+import {
+  gameState,
+  perkState,
+  selectedContinent,
+  chart,
+} from "./composables/gameState.js";
 import PerkCard from "./components/PerkCards.vue";
 import TickHandler from "./components/TickHandler.vue";
 import WorldMap from "./components/WorldMap.vue";
-import GameChart from './components/SellChart.vue';
-import {
-  formatPrice,
-  formatDate,
-} from "./utils/helpers/format.js";
+import GameChart from "./components/SellChart.vue";
+import RealEstate from "./components/RealEstate.vue";
+import { formatPrice, formatDate } from "./utils/helpers/format.js";
 const {
   currentDemand,
   makeCopperWire,
@@ -44,9 +47,7 @@ const {
       <p>
         Demand: <strong>{{ formatPrice(currentDemand) }}</strong>
       </p>
-      <p>
-        Refined Copper: {{ formatPrice(gameState.availableCopper) }} kg
-      </p>
+      <p>Refined Copper: {{ formatPrice(gameState.availableCopper) }} kg</p>
       <div class="commodity">
         <button
           v-if="perkState.hasContractProvider"
@@ -124,21 +125,15 @@ const {
       <div class="perks-container">
         <div class="industrial-perks">
           <PerkCard
-            v-if="
-              !perkState.hasMachinery &&
-              gameState.lifeTimeCopperWire >= 0
-            "
+            v-if="!perkState.hasMachinery && gameState.lifeTimeCopperWire >= 0"
             perk-id="machinery"
             title="Garage Factory"
             description="Automatize the production of copper wire."
             :price="100.0"
           />
           <PerkCard
-            v-if="
-              perkState.hasMachinery &&
-              gameState.lifeTimeCopperWire >= 0
-            "
-            perk-id="real-state"
+            v-if="perkState.hasMachinery && !perkState.hasRealState && gameState.lifeTimeCopperWire >= 0"
+            perk-id="real-estate"
             title="Invest in Real State"
             description="Buy buildings for a bigger production."
             :price="1000.0"
@@ -156,20 +151,26 @@ const {
             :price="30.0"
           />
         </div>
-        <div class="marketing-perks"></div>
+        <div class="marketing-perks">
+          <PerkCard
+            v-if="!perkState.hasPatentLogo && gameState.lifeTimeCopperWire >= 0"
+            perk-id="patent-logo"
+            title="Patent your logo"
+            description="Secure your brand identity and increase your market value."
+            :price="150.0"
+          />
+        </div>
         <div class="innovation-perks"></div>
       </div>
     </div>
-    <div class="world-map-container">
+    <div v-if="perkState.hasRealState" class="world-map-container">
       <WorldMap />
     </div>
-    <div class="world-map-info">
-      <div class="real-state">
-        {{ selectedContinent.name.replace("-", " ") }}
+    <div v-if="perkState.hasRealState" class="world-map-info">
+      <div v-if="selectedContinent.name!='No continent selected'" class="real-state">
+        <RealEstate />
       </div>
-      <div class="stakeholding">
-        {{ selectedContinent.name.replace("-", " ") }}
-      </div>
+      <div class="stakeholding"></div>
     </div>
   </div>
 </template>
