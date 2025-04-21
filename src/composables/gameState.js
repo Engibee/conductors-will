@@ -2,8 +2,12 @@ import { ref, reactive, onMounted, onUnmounted, computed, watch } from "vue";
 
 //STOCK HANDLE
 export const gameState = reactive({
+  //PAUSE HANDLE
+  isPaused: false,
+  isStakeModalOpen: false,
+
   //STOCK HANDLE
-  funds: 2000,
+  funds: 20000,
   lifeTimeCopperWire: 0,
   copperWireinMeter: 0,
   availableCopper: 10,

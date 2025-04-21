@@ -8,7 +8,7 @@ let interval = null
 onMounted(() => {
   console.log('✅ Tick handler montado')
   interval = setInterval(() => {
-    gameState.ticks++
+    gameState.isPaused ? null : gameState.ticks++;
   }, 1000)
 })
 

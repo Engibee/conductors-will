@@ -32,8 +32,6 @@
   gap: 0px;
   padding: 10px;
   position: fixed;
-  overflow-x: auto;
-  overflow-y: auto;
   top: 48px;
   left: 0;
 }
@@ -284,23 +282,15 @@ h4 {
   font-size: 14px;
 }
 
-.real-state{
+.real-estate{
   width: 202.5px;
   height: 114px;
-  border-color: #4caf50;
-  border-style: solid;
-  border-width: 1px;
-  border-radius: 10px;
   box-sizing: border-box;
 }
 
 .stakeholding{
   width: 202.5px;
   height: 114px;
-  border-color: #4caf50;
-  border-style: solid;
-  border-width: 1px;
-  border-radius: 10px;
   box-sizing: border-box;
 }
 
@@ -317,6 +307,7 @@ body {
   margin: 0;
   display: flex;
   place-items: center;
+  overflow-x: auto;
   overflow-y: auto;
   min-width: 320px;
   min-height: 100vh;

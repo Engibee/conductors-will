@@ -11,6 +11,8 @@ import TickHandler from "./components/TickHandler.vue";
 import WorldMap from "./components/WorldMap.vue";
 import GameChart from "./components/SellChart.vue";
 import RealEstate from "./components/RealEstate.vue";
+import Stakeholding from "./components/Stakeholding.vue";
+import StakeTrading from "./components/StakeTrading.vue";
 import { formatPrice, formatDate } from "./utils/helpers/format.js";
 const {
   currentDemand,
@@ -27,6 +29,11 @@ const {
 
 <template>
   <TickHandler />
+ <div v-if="gameState.isStakeModalOpen" class="modal-overlay">
+  <div class="modal-window">
+    <StakeTrading />
+  </div>
+</div>
   <div class="top-bar">
     <div class="totalCopper">
       Copper Wire made: {{ gameState.lifeTimeCopperWire.toLocaleString() }}m
@@ -79,7 +86,7 @@ const {
         <div class="autoinfo">
           <button @click="buy_worker">Buy worker</button>
           <p>Price: ${{ formatPrice(gameState.workersPrice) }}</p>
-          <p>Amount of workers: {{ gameState.workers }}</p>
+          <p>Amount of workers: {{ (gameState.workers + (gameState.factories * 100)) }}  (+{{ (gameState.factories * 100) }})</p>
         </div>
         <p class="mini_info">Generates 1 meter of copper per tick(second)</p>
       </div>
@@ -167,10 +174,12 @@ const {
       <WorldMap />
     </div>
     <div v-if="perkState.hasRealState" class="world-map-info">
-      <div v-if="selectedContinent.name!='No continent selected'" class="real-state">
+      <div v-if="selectedContinent.name!='No continent selected'" class="real-estate">
         <RealEstate />
       </div>
-      <div class="stakeholding"></div>
+      <div v-if="selectedContinent.name!='No continent selected'" class="stakeholding">
+        <Stakeholding />
+      </div>
     </div>
   </div>
 </template>

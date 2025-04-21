@@ -1,20 +1,24 @@
-import {
-  onMounted,
-  onUnmounted,
-  computed,
-  watch,
-  toRaw,
-} from "vue";
+import { onMounted, onUnmounted, computed, watch, toRaw } from "vue";
 import { saveGame, loadGame, clearGame } from "./localStorage";
 import { formatDate } from "../utils/helpers/format.js";
 import * as transaction from "../utils/helpers/transactionHandle.js";
-import { gameState, perkState, selectedContinent, chart, continentRealEstate } from "./gameState.js";
+import {
+  gameState,
+  perkState,
+  selectedContinent,
+  chart,
+  continentRealEstate,
+} from "./gameState.js";
 
 let intervalo = null;
 
 export function usePaperclipGame() {
   onMounted(() => {
-    intervalo = setInterval(update_tick, 1000);
+    setInterval(() => {
+      if (!gameState.isPaused) {
+        update_tick();
+      }
+    }, 1000);
     console.log(`O contador foi montado.`);
     clearGame();
     const data = loadGame();
@@ -33,7 +37,7 @@ export function usePaperclipGame() {
   });
 
   const update_tick = () => {
-    if (ticks_events(40)){
+    if (ticks_events(40)) {
       rentedBuildingHandler();
     }
     if (ticks_events(10)) {
@@ -73,14 +77,17 @@ export function usePaperclipGame() {
   function automation_handler() {
     if (
       gameState.availableCopper >=
-      gameState.copperQtPerMeter * gameState.workers
+      gameState.copperQtPerMeter *
+        (gameState.workers + gameState.factories * 100)
     ) {
-      gameState.copperWireinMeter += 1 * gameState.workers;
-      gameState.lifeTimeCopperWire += 1 * gameState.workers;
+      gameState.copperWireinMeter +=
+        1 * (gameState.workers + gameState.factories * 100);
+      gameState.lifeTimeCopperWire +=
+        1 * (gameState.workers + gameState.factories * 100);
       gameState.availableCopper -=
-        1 * gameState.workers * gameState.copperQtPerMeter;
-    } else {
-      //Nothing yet.
+        1 *
+        (gameState.workers + gameState.factories * 100) *
+        gameState.copperQtPerMeter;
     }
   }
   function buy_refined_copper() {
@@ -128,10 +135,16 @@ export function usePaperclipGame() {
     }
   }
   function rentedBuildingHandler() {
-    gameState.funds += gameState.rentedBuilding * 200;
-    logMessage(
-      `Your monthly rent income: $${(gameState.rentedBuilding * 200).toLocaleString()}!`
-    );
+    if (perkState.hasRealState && gameState.rentedBuilding > 0) {
+      gameState.funds += gameState.rentedBuilding * 200;
+      gameState.monthlySale += gameState.rentedBuilding * 200;
+      logMessage(
+        `Your monthly rent income: $${(
+          gameState.rentedBuilding * 200
+        ).toLocaleString()}!`
+      );
+      console.log(gameState.rentedBuilding);
+    }
   }
   function ticks_events(tick) {
     return gameState.ticks % tick === 0;
@@ -154,7 +167,8 @@ export function usePaperclipGame() {
   function buy_simulation_per_tick() {
     const marketingLevel = gameState.marketing;
 
-    const maxSales = 10 + ((marketingLevel * 30) * gameState.maxSaleModifier);
+    const maxSales =
+      (99.999 * Math.pow(marketingLevel, 2) + 10) * gameState.maxSaleModifier;
     const demand = currentDemand.value;
 
     const baseSales = maxSales * 0.5 * demand;
@@ -164,7 +178,9 @@ export function usePaperclipGame() {
     const finalSales = Math.min(estimatedSales, gameState.copperWireinMeter);
 
     if (finalSales > 0) {
-      console.log(`Sold products: ${finalSales}, Max sale: ${maxSales}, Max sale factor: ${gameState.maxSaleModifier}`);
+      console.log(
+        `Sold products: ${finalSales}, Max sale: ${maxSales}, Max sale factor: ${gameState.maxSaleModifier}`
+      );
       gameState.copperWireinMeter -= finalSales;
 
       const revenue = finalSales * gameState.priceOfCopper;

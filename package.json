@@ -11,6 +11,8 @@
   "dependencies": {
     "chart.js": "^4.4.8",
     "chartjs-plugin-zoom": "^2.2.0",
+    "mathcheck": "^1.0.3",
+    "pinia": "^3.0.2",
     "vite-plugin-string": "^1.2.3",
     "vue": "^3.5.13"
   },
