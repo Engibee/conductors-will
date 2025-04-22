@@ -1,20 +1,20 @@
 <template>
   <div v-if="continentRealEstate[selectedContinent.name].license && selectedContinent.name!='No continent selected'">
     <p class="real-state-info">
-      Factories {{ continentRealEstate[selectedContinent.name].factories }}
+      🏭Factories: {{ continentRealEstate[selectedContinent.name].factories }}
       <button @click="increaseFactory" class="real-state-info-btn">
         Factorize
       </button>
     </p>
     <p class="real-state-info">
-      Available Buildings:
+      🏚️Available Buildings:
       {{ continentRealEstate[selectedContinent.name].availableBuildings }}
       <button @click="buyRealEstate" class="real-state-info-btn">
         Buy: $10,000
       </button>
     </p>
     <p class="real-state-info">
-      Rented Buildings:
+      🏘️Rented Buildings:
       {{ continentRealEstate[selectedContinent.name].rentedBuildings }}
       <button @click="increaseRentedBulding" class="real-state-info-btn">
         Rent
@@ -62,6 +62,7 @@ function increaseFactory() {
     continentRealEstate[selectedContinent.name].factories += 1;
     gameState.factories += 1;
     continentRealEstate[selectedContinent.name].rentedBuildings -= 1;
+    gameState.rentedBuilding -= 1;
   } else {
     alert("Not enough buildings to build a factory.");
   }

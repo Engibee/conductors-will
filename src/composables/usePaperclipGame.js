@@ -1,6 +1,7 @@
 import { onMounted, onUnmounted, computed, watch, toRaw } from "vue";
 import { saveGame, loadGame, clearGame } from "./localStorage";
 import { formatDate } from "../utils/helpers/format.js";
+import { checkStakeGameBegin } from "../utils/helpers/checkers.js";
 import * as transaction from "../utils/helpers/transactionHandle.js";
 import {
   gameState,
@@ -8,6 +9,7 @@ import {
   selectedContinent,
   chart,
   continentRealEstate,
+  stakeHoldingTrading,
 } from "./gameState.js";
 
 let intervalo = null;
@@ -19,6 +21,7 @@ export function usePaperclipGame() {
         update_tick();
       }
     }, 1000);
+    checkStakeGameBegin() ? generateInitialStakeholding() : null;
     console.log(`O contador foi montado.`);
     clearGame();
     const data = loadGame();
@@ -57,6 +60,26 @@ export function usePaperclipGame() {
       });
     }
   };
+
+  function generateInitialStakeholding() {
+    const organizations = [
+      "Governments",
+      "TechCorporations",
+      "FinancialFunds",
+      "NGOs",
+    ];
+
+    const randomValues = organizations.map(() => Math.random());
+    const total = randomValues.reduce((sum, val) => sum + val, 0);
+
+    organizations.forEach((org, i) => {
+      stakeHoldingTrading[org].stake = parseFloat(
+        ((randomValues[i] / total) * 100).toFixed(2)
+      );
+    });
+
+    stakeHoldingTrading.You = 0.0;
+  }
 
   function chartUpdate(newSale, month) {
     chart.chartLabel.push(month);

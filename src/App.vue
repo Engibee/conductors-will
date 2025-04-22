@@ -45,7 +45,7 @@ const {
       <button @click="makeCopperWire">Make Copper Wire</button>
 
       <h5>Business</h5>
-      <p>💵Funds: ${{ formatPrice(gameState.funds) }}</p>
+      <p>💵Funds: ${{ formatPrice(gameState.funds).toLocaleString() }}</p>
       <p class="sellprice">
         <button @click="decreasePrice" class="small-btn">-</button>
         <button @click="increasePrice" class="small-btn">+</button>

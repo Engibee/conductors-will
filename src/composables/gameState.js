@@ -1,3 +1,4 @@
+import { factory } from "typescript";
 import { ref, reactive, onMounted, onUnmounted, computed, watch } from "vue";
 
 //STOCK HANDLE
@@ -28,7 +29,7 @@ export const gameState = reactive({
   //REAL ESTATE HANDLE
   availableBuildings: 0,
   factories: 0,
-  rentedBuilding:0,
+  rentedBuilding: 0,
 
   //TIME HANDLE
   intervalo: null,
@@ -83,6 +84,56 @@ export const continentRealEstate = reactive({
 export const chart = reactive({
   chartLabel: [],
   chartData: [],
+});
+
+export const stakeHoldingTrading = reactive({
+  //STAKEHOLDER INDEX
+  selectedOrganization: "Nothing selected",
+
+  //STAKE HANDLE
+  Governments: {
+    stake: 0,
+    valuationWeight: {
+      funds: 2.0,
+      copper: 0.5,
+      residential: 1.0,
+      factories: 1.0,
+    },
+  },
+  TechCorporations: {
+    stake: 0,
+    valuationWeight: {
+      funds: 1.0,
+      copper: 2.5,
+      residential: 1.0,
+      factories: 1.0,
+    },
+  },
+  FinancialFunds: {
+    stake: 0,
+    valuationWeight: {
+      funds: 1.0,
+      copper: 1.0,
+      residential: 2.0,
+      factories: 2.0,
+    },
+  },
+  NGOs: {
+    stake: 0,
+    valuationWeight: {
+      funds: 1.0,
+      copper: 1.0,
+      residential: 2.0,
+      factories: 2.0,
+    },
+  },
+  You: 0,
+
+  //TRADING HANDLE
+  fundsOffer: 0,
+  copperWireinMeterOffer: 0,
+  rentedBuildingOffer: 0,
+  factoriesOffer: 0,
 });
 
 export const perkState = reactive({
