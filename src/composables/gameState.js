@@ -1,4 +1,3 @@
-import { factory } from "typescript";
 import { ref, reactive, onMounted, onUnmounted, computed, watch } from "vue";
 
 //STOCK HANDLE
