@@ -1,4 +1,4 @@
-import { onMounted, onUnmounted, computed, watch, toRaw } from "vue";
+import { onMounted, onUnmounted, computed, toRaw } from "vue";
 import { saveGame, loadGame, clearGame } from "./localStorage";
 import { formatDate } from "../utils/helpers/format.js";
 import { checkStakeGameBegin } from "../utils/helpers/checkers.js";
@@ -10,6 +10,7 @@ import {
   chart,
   continentRealEstate,
   stakeHoldingTrading,
+  resourcesValue,
 } from "./gameState.js";
 
 let intervalo = null;
@@ -23,7 +24,6 @@ export function usePaperclipGame() {
     }, 1000);
     checkStakeGameBegin() ? generateInitialStakeholding() : null;
     console.log(`O contador foi montado.`);
-    clearGame();
     const data = loadGame();
     if (data) {
       Object.assign(gameState, data.state);
@@ -31,6 +31,8 @@ export function usePaperclipGame() {
       Object.assign(selectedContinent, data.selectedContinent);
       Object.assign(chart, data.chartInstance);
       Object.assign(continentRealEstate, data.continentRealEstate);
+      Object.assign(stakeHoldingTrading, data.stakeHoldingTrading);
+      Object.assign(resourcesValue, data.resourcesValue);
     }
   });
   onUnmounted(() => {
@@ -50,6 +52,7 @@ export function usePaperclipGame() {
       buy_simulation_per_tick();
     }
     if (ticks_events(1)) {
+      generateOrePerStake();
       automation_handler();
       saveGame({
         state: toRaw(gameState),
@@ -57,9 +60,25 @@ export function usePaperclipGame() {
         selectedContinent: toRaw(selectedContinent),
         chartInstance: toRaw(chart),
         continentRealEstate: toRaw(continentRealEstate),
+        stakeHoldingTrading: toRaw(stakeHoldingTrading),
+        resourcesValue: toRaw(resourcesValue),
       });
     }
   };
+
+  function generateOrePerStake() {
+    const oreTransaction = Math.pow(stakeHoldingTrading.You, 1.1) * 1000;
+
+    gameState.availableCopperOre += oreTransaction;
+    gameState.globalCopperOre -= oreTransaction;
+
+    if (perkState.hasRefinery){
+      if (gameState.availableCopperOre >= 100){
+        gameState.availableCopperOre -= 100;
+        gameState.availableCopper += 1;
+      }
+    }
+  }
 
   function generateInitialStakeholding() {
     const organizations = [

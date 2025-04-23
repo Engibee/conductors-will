@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount, ref, watch } from "vue";
+import { onMounted, onBeforeUnmount, ref, watch, computed } from "vue";
 import Chart from "chart.js/auto";
 import zoomPlugin from "chartjs-plugin-zoom";
 import { gameState, stakeHoldingTrading } from "../composables/gameState";
@@ -26,6 +26,14 @@ function pause() {
     alert("Please select an organization to trade with.");
   }
 }
+
+const stakeData = computed(() => [
+  stakeHoldingTrading.Governments.stake,
+  stakeHoldingTrading.TechCorporations.stake,
+  stakeHoldingTrading.FinancialFunds.stake,
+  stakeHoldingTrading.NGOs.stake,
+  stakeHoldingTrading.You,
+]);
 
 Chart.register(zoomPlugin);
 
@@ -52,11 +60,7 @@ onMounted(() => {
         {
           label: "Stakes",
           data: [
-            stakeHoldingTrading.Governments.stake,
-            stakeHoldingTrading.TechCorporations.stake,
-            stakeHoldingTrading.FinancialFunds.stake,
-            stakeHoldingTrading.NGOs.stake,
-            stakeHoldingTrading.You,
+            ...stakeData.value
           ], // em porcentagem
           backgroundColor: [
             "#4CAF50", // Verde
@@ -128,15 +132,13 @@ onMounted(() => {
 });
 
 watch(
-  () => [props.labels, props.data],
-  () => {
+  stakeData,
+  (newData) => {
     if (chartInstance) {
-      chartInstance.data.labels = [...props.labels];
-      chartInstance.data.datasets[0].data = [...props.data];
+      chartInstance.data.datasets[0].data = [...newData];
       chartInstance.update();
     }
-  },
-  { deep: true }
+  }
 );
 
 onBeforeUnmount(() => {

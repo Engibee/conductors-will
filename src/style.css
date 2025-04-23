@@ -55,7 +55,7 @@
 }
 
 .card.lab.lab-moved {
-  transform: translateY(163px);
+  transform: translateY(162px);
 }
 
 .fade-slide-enter-active,
@@ -100,6 +100,18 @@ h4 {
   font-size: 12px;
   gap: 10px;
   justify-content: center;
+}
+
+.mining-info{
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  justify-content: center;
+  border-radius: 10px;
+  margin-top: 62px;
+  margin-left: 10px;
+  background-color: #213547;
+  color: white; /* espaço entre barra e info */
 }
 
 .world-map-info {

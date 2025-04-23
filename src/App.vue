@@ -29,11 +29,11 @@ const {
 
 <template>
   <TickHandler />
- <div v-if="gameState.isStakeModalOpen" class="modal-overlay">
-  <div class="modal-window">
-    <StakeTrading />
+  <div v-if="gameState.isStakeModalOpen" class="modal-overlay">
+    <div class="modal-window">
+      <StakeTrading />
+    </div>
   </div>
-</div>
   <div class="top-bar">
     <div class="totalCopper">
       Copper Wire made: {{ gameState.lifeTimeCopperWire.toLocaleString() }}m
@@ -86,7 +86,12 @@ const {
         <div class="autoinfo">
           <button @click="buy_worker">Buy worker</button>
           <p>Price: ${{ formatPrice(gameState.workersPrice) }}</p>
-          <p>Amount of workers: {{ (gameState.workers + (gameState.factories * 100)) }}  (+{{ (gameState.factories * 100) }})</p>
+          <p>
+            Amount of workers:
+            {{ gameState.workers + gameState.factories * 100 }} (+{{
+              gameState.factories * 100
+            }})
+          </p>
         </div>
         <p class="mini_info">Generates 1 meter of copper per tick(second)</p>
       </div>
@@ -139,11 +144,22 @@ const {
             :price="100.0"
           />
           <PerkCard
-            v-if="perkState.hasMachinery && !perkState.hasRealState && gameState.lifeTimeCopperWire >= 0"
+            v-if="perkState.hasMachinery && !perkState.hasRealEstate"
             perk-id="real-estate"
-            title="Invest in Real State"
+            title="Invest in Real Estate"
             description="Buy buildings for a bigger production."
             :price="1000.0"
+          />
+          <PerkCard
+            v-if="
+              perkState.hasMachinery &&
+              perkState.hasRealEstate &&
+              !perkState.hasRefinery
+            "
+            perk-id="refinery"
+            title="Build a refinery"
+            description="Allows a passive production of refined copper using ore."
+            :price="20000.0"
           />
         </div>
         <div class="commodity-perks">
@@ -170,16 +186,26 @@ const {
         <div class="innovation-perks"></div>
       </div>
     </div>
-    <div v-if="perkState.hasRealState" class="world-map-container">
+    <div v-if="perkState.hasRealEstate" class="world-map-container">
       <WorldMap />
     </div>
-    <div v-if="perkState.hasRealState" class="world-map-info">
-      <div v-if="selectedContinent.name!='No continent selected'" class="real-estate">
+    <div v-if="perkState.hasRealEstate" class="world-map-info">
+      <div
+        v-if="selectedContinent.name != 'No continent selected'"
+        class="real-estate"
+      >
         <RealEstate />
       </div>
-      <div v-if="selectedContinent.name!='No continent selected'" class="stakeholding">
+      <div
+        v-if="selectedContinent.name != 'No continent selected'"
+        class="stakeholding"
+      >
         <Stakeholding />
       </div>
+    </div>
+    <div v-if="perkState.hasRefinery" class="mining-info">
+      Global ore: {{ gameState.globalCopperOre.toLocaleString() }} Available
+      ore: {{ (gameState.availableCopperOre).toFixed(3) }}
     </div>
   </div>
 </template>

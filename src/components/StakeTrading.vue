@@ -12,7 +12,7 @@
               min="0"
               @change="validateOffer('funds')"
             />
-            max: ${{ (gameState.funds).toLocaleString() }}
+            max: ${{ gameState.funds.toLocaleString() }}
           </p>
         </div>
         <div class="copperWire">
@@ -25,7 +25,7 @@
               min="0"
               @change="validateOffer('copperWireinMeter')"
             />
-            max: {{ (gameState.copperWireinMeter).toLocaleString() }}m
+            max: {{ gameState.copperWireinMeter.toLocaleString() }}m
           </p>
         </div>
         <div class="residential">
@@ -64,9 +64,9 @@
             stakeHoldingTrading[
               stakeHoldingTrading.selectedOrganization.replace(" ", "")
             ].stake
-          }}%
+          }}% -({{ calculateStakeOffer() }}%)
         </p>
-        <p>Your stake: {{ stakeHoldingTrading.You }}%</p>
+        <p>Your stake: {{ stakeHoldingTrading.You }}% +({{ calculateStakeOffer() }}%)</p>
       </div>
       <div class="action">
         <button @click="confirmStake">Confirm</button
@@ -77,8 +77,29 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { gameState, stakeHoldingTrading } from "../composables/gameState";
+import { resetStakeOffers } from "../utils/helpers/transactionHandle";
+import { gameState, stakeHoldingTrading, resourcesValue } from "../composables/gameState";
+
+function calculateStakeOffer() {
+  const org = stakeHoldingTrading.selectedOrganization.replace(" ", "");
+  const orgData = stakeHoldingTrading[org];
+  if (!orgData || !orgData.valuationWeight) return 0;
+
+  const weights = orgData.valuationWeight;
+
+  const offerScore =
+    stakeHoldingTrading.fundsOffer * resourcesValue.funds * weights.funds +
+    stakeHoldingTrading.copperWireinMeterOffer * resourcesValue.copperWireinMeter * weights.copper +
+    stakeHoldingTrading.rentedBuildingOffer * resourcesValue.rentedBuilding * weights.residential +
+    stakeHoldingTrading.factoriesOffer * resourcesValue.factories * weights.factories;
+
+  const stakeAlreadyOwned = orgData.stake;
+  const availabilityFactor = 1 - stakeAlreadyOwned / 100;
+
+  const rawStake = (offerScore * availabilityFactor) / 1000000;
+
+  return parseFloat(rawStake.toFixed(4));
+}
 
 function validateOffer(commodity) {
   const offerKey = `${commodity}Offer`;
@@ -95,9 +116,22 @@ const tabClose = () => {
   gameState.isPaused = false;
   gameState.isStakeModalOpen = false;
   gameState.selectedOrganization = null;
+  resetStakeOffers();
 };
 
 const confirmStake = () => {
+  const org = stakeHoldingTrading.selectedOrganization.replace(" ", "");
+  const orgData = stakeHoldingTrading[org];
+  const offerScore = calculateStakeOffer();
+
+  stakeHoldingTrading.You += offerScore;
+  orgData.stake -= offerScore;
+
+  gameState.funds -= stakeHoldingTrading.fundsOffer;
+  gameState.copperWireinMeter -= stakeHoldingTrading.copperWireinMeterOffer;
+  gameState.rentedBuilding -= stakeHoldingTrading.rentedBuildingOffer;
+  gameState.factories -= stakeHoldingTrading.factoriesOffer;
+
   tabClose();
 };
 

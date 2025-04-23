@@ -10,11 +10,13 @@ export function buyPerk(perk) {
     perkState.hasContractProvider = true;
   }
   if (perk === "real-estate") {
-    perkState.hasRealState = true;
+    perkState.hasRealEstate = true;
   }
   if (perk === "patent-logo") {
     perkState.hasPatentLogo = true;
     gameState.maxSaleModifier += 0.1;
-
+  }
+  if (perk === "refinery") {
+    perkState.hasRefinery = true;
   }
 }

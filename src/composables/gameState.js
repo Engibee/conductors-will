@@ -7,10 +7,12 @@ export const gameState = reactive({
   isStakeModalOpen: false,
 
   //STOCK HANDLE
-  funds: 20000,
+  funds: 30,
   lifeTimeCopperWire: 0,
   copperWireinMeter: 0,
+  globalCopperOre: 1_000_000_000_000_000,
   availableCopper: 10,
+  availableCopperOre: 0,
   workers: 0,
 
   //PRICES HANDLE
@@ -85,6 +87,13 @@ export const chart = reactive({
   chartData: [],
 });
 
+export const resourcesValue = reactive({
+  funds: 1,
+  copperWireinMeter: 20,
+  rentedBuilding: 10000,
+  factories: 10000,
+});
+
 export const stakeHoldingTrading = reactive({
   //STAKEHOLDER INDEX
   selectedOrganization: "Nothing selected",
@@ -138,8 +147,9 @@ export const stakeHoldingTrading = reactive({
 export const perkState = reactive({
   hasMachinery: false,
   hasContractProvider: false,
-  hasRealState: false,
+  hasRealEstate: false,
   hasPatentLogo: false,
+  hasRefinery: false,
 });
 
 export const selectedContinent = reactive({

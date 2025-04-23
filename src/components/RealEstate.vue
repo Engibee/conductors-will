@@ -1,5 +1,10 @@
 <template>
-  <div v-if="continentRealEstate[selectedContinent.name].license && selectedContinent.name!='No continent selected'">
+  <div
+    v-if="
+      continentRealEstate[selectedContinent.name].license &&
+      selectedContinent.name != 'No continent selected'
+    "
+  >
     <p class="real-state-info">
       🏭Factories: {{ continentRealEstate[selectedContinent.name].factories }}
       <button @click="increaseFactory" class="real-state-info-btn">
@@ -58,11 +63,6 @@ function increaseFactory() {
     continentRealEstate[selectedContinent.name].factories += 1;
     gameState.factories += 1;
     continentRealEstate[selectedContinent.name].availableBuildings -= 1;
-  } else if (continentRealEstate[selectedContinent.name].rentedBuildings > 0) {
-    continentRealEstate[selectedContinent.name].factories += 1;
-    gameState.factories += 1;
-    continentRealEstate[selectedContinent.name].rentedBuildings -= 1;
-    gameState.rentedBuilding -= 1;
   } else {
     alert("Not enough buildings to build a factory.");
   }
@@ -73,11 +73,6 @@ function increaseRentedBulding() {
     continentRealEstate[selectedContinent.name].rentedBuildings += 1;
     gameState.rentedBuilding += 1;
     continentRealEstate[selectedContinent.name].availableBuildings -= 1;
-  } else if (continentRealEstate[selectedContinent.name].factories > 0) {
-    continentRealEstate[selectedContinent.name].rentedBuildings += 1;
-    gameState.rentedBuilding += 1;
-    continentRealEstate[selectedContinent.name].factories -= 1;
-    gameState.factories -= 1;
   } else {
     alert("Not enough buildings to rent.");
   }
