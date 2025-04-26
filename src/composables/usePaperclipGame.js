@@ -11,6 +11,9 @@ import {
   continentRealEstate,
   stakeHoldingTrading,
   resourcesValue,
+  totalFactories,
+  totalAvailableBuildings,
+  totalRentedBuildings,
 } from "./gameState.js";
 
 let intervalo = null;
@@ -24,6 +27,7 @@ export function usePaperclipGame() {
     }, 1000);
     checkStakeGameBegin() ? generateInitialStakeholding() : null;
     console.log(`O contador foi montado.`);
+    clearGame();
     const data = loadGame();
     if (data) {
       Object.assign(gameState, data.state);
@@ -120,15 +124,15 @@ export function usePaperclipGame() {
     if (
       gameState.availableCopper >=
       gameState.copperQtPerMeter *
-        (gameState.workers + gameState.factories * 100)
+        (gameState.workers + totalFactories.value * 100)
     ) {
       gameState.copperWireinMeter +=
-        1 * (gameState.workers + gameState.factories * 100);
+        1 * (gameState.workers + totalFactories.value * 100);
       gameState.lifeTimeCopperWire +=
-        1 * (gameState.workers + gameState.factories * 100);
+        1 * (gameState.workers + totalFactories.value * 100);
       gameState.availableCopper -=
         1 *
-        (gameState.workers + gameState.factories * 100) *
+        (gameState.workers + totalFactories.value * 100) *
         gameState.copperQtPerMeter;
     }
   }
@@ -177,15 +181,14 @@ export function usePaperclipGame() {
     }
   }
   function rentedBuildingHandler() {
-    if (perkState.hasRealState && gameState.rentedBuilding > 0) {
-      gameState.funds += gameState.rentedBuilding * 200;
-      gameState.monthlySale += gameState.rentedBuilding * 200;
+    if (perkState.hasRealEstate && totalRentedBuildings.value > 0) {
+      gameState.funds += totalRentedBuildings.value * 200;
+      gameState.monthlySale += totalRentedBuildings.value * 200;
       logMessage(
         `Your monthly rent income: $${(
-          gameState.rentedBuilding * 200
+          totalRentedBuildings.value * 200
         ).toLocaleString()}!`
       );
-      console.log(gameState.rentedBuilding);
     }
   }
   function ticks_events(tick) {

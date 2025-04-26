@@ -34,11 +34,11 @@
             <input
               type="number"
               v-model.number="stakeHoldingTrading.rentedBuildingOffer"
-              :max="gameState.rentedBuilding"
+              :max="continentRealEstate[selectedContinent.name].rentedBuildings"
               min="0"
               @change="validateOffer('residential')"
             />
-            max: {{ gameState.rentedBuilding }}
+            max: {{ continentRealEstate[selectedContinent.name].rentedBuildings }}
           </p>
         </div>
         <div class="factory">
@@ -47,11 +47,11 @@
             <input
               type="number"
               v-model.number="stakeHoldingTrading.factoriesOffer"
-              :max="gameState.factories"
+              :max="continentRealEstate[selectedContinent.name].factories"
               min="0"
               @change="validateOffer('factories')"
             />
-            max: {{ gameState.factories }}
+            max: {{ continentRealEstate[selectedContinent.name].factories }}
           </p>
         </div>
       </div>
@@ -66,7 +66,11 @@
             ].stake
           }}% -({{ calculateStakeOffer() }}%)
         </p>
-        <p>Your stake: {{ stakeHoldingTrading.You }}% +({{ calculateStakeOffer() }}%)</p>
+        <p>
+          Your stake: {{ stakeHoldingTrading.You }}% +({{
+            calculateStakeOffer()
+          }}%)
+        </p>
       </div>
       <div class="action">
         <button @click="confirmStake">Confirm</button
@@ -78,7 +82,16 @@
 
 <script setup>
 import { resetStakeOffers } from "../utils/helpers/transactionHandle";
-import { gameState, stakeHoldingTrading, resourcesValue } from "../composables/gameState";
+import {
+  gameState,
+  stakeHoldingTrading,
+  resourcesValue,
+  totalAvailableBuildings,
+  totalFactories,
+  totalRentedBuildings,
+  continentRealEstate,
+  selectedContinent,
+} from "../composables/gameState";
 
 function calculateStakeOffer() {
   const org = stakeHoldingTrading.selectedOrganization.replace(" ", "");
@@ -89,9 +102,15 @@ function calculateStakeOffer() {
 
   const offerScore =
     stakeHoldingTrading.fundsOffer * resourcesValue.funds * weights.funds +
-    stakeHoldingTrading.copperWireinMeterOffer * resourcesValue.copperWireinMeter * weights.copper +
-    stakeHoldingTrading.rentedBuildingOffer * resourcesValue.rentedBuilding * weights.residential +
-    stakeHoldingTrading.factoriesOffer * resourcesValue.factories * weights.factories;
+    stakeHoldingTrading.copperWireinMeterOffer *
+      resourcesValue.copperWireinMeter *
+      weights.copper +
+    stakeHoldingTrading.rentedBuildingOffer *
+      resourcesValue.rentedBuilding *
+      weights.residential +
+    stakeHoldingTrading.factoriesOffer *
+      resourcesValue.factories *
+      weights.factories;
 
   const stakeAlreadyOwned = orgData.stake;
   const availabilityFactor = 1 - stakeAlreadyOwned / 100;
@@ -129,8 +148,8 @@ const confirmStake = () => {
 
   gameState.funds -= stakeHoldingTrading.fundsOffer;
   gameState.copperWireinMeter -= stakeHoldingTrading.copperWireinMeterOffer;
-  gameState.rentedBuilding -= stakeHoldingTrading.rentedBuildingOffer;
-  gameState.factories -= stakeHoldingTrading.factoriesOffer;
+  continentRealEstate[selectedContinent.name].rentedBuildings -= stakeHoldingTrading.rentedBuildingOffer;
+  continentRealEstate[selectedContinent.name].factories -= stakeHoldingTrading.factoriesOffer;
 
   tabClose();
 };

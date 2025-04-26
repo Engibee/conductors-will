@@ -5,6 +5,9 @@ import {
   perkState,
   selectedContinent,
   chart,
+  totalAvailableBuildings,
+  totalFactories,
+  totalRentedBuildings,
 } from "./composables/gameState.js";
 import PerkCard from "./components/PerkCards.vue";
 import TickHandler from "./components/TickHandler.vue";
@@ -88,8 +91,8 @@ const {
           <p>Price: ${{ formatPrice(gameState.workersPrice) }}</p>
           <p>
             Amount of workers:
-            {{ gameState.workers + gameState.factories * 100 }} (+{{
-              gameState.factories * 100
+            {{ gameState.workers + totalFactories * 100 }} (+{{
+              totalFactories * 100
             }})
           </p>
         </div>

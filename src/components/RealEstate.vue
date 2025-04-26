@@ -36,7 +36,6 @@
 
 <script setup>
 import {
-  gameState,
   continentRealEstate,
   selectedContinent,
 } from "../composables/gameState.js";
@@ -61,7 +60,6 @@ function buyRealEstate() {
 function increaseFactory() {
   if (continentRealEstate[selectedContinent.name].availableBuildings > 0) {
     continentRealEstate[selectedContinent.name].factories += 1;
-    gameState.factories += 1;
     continentRealEstate[selectedContinent.name].availableBuildings -= 1;
   } else {
     alert("Not enough buildings to build a factory.");
@@ -71,7 +69,6 @@ function increaseFactory() {
 function increaseRentedBulding() {
   if (continentRealEstate[selectedContinent.name].availableBuildings > 0) {
     continentRealEstate[selectedContinent.name].rentedBuildings += 1;
-    gameState.rentedBuilding += 1;
     continentRealEstate[selectedContinent.name].availableBuildings -= 1;
   } else {
     alert("Not enough buildings to rent.");

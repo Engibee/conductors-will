@@ -7,7 +7,7 @@ export const gameState = reactive({
   isStakeModalOpen: false,
 
   //STOCK HANDLE
-  funds: 30,
+  funds: 999999,
   lifeTimeCopperWire: 0,
   copperWireinMeter: 0,
   globalCopperOre: 1_000_000_000_000_000,
@@ -26,11 +26,6 @@ export const gameState = reactive({
   marketingPrice: 10,
   demandModifier: 1,
   maxSaleModifier: 1,
-
-  //REAL ESTATE HANDLE
-  availableBuildings: 0,
-  factories: 0,
-  rentedBuilding: 0,
 
   //TIME HANDLE
   intervalo: null,
@@ -89,7 +84,7 @@ export const chart = reactive({
 
 export const resourcesValue = reactive({
   funds: 1,
-  copperWireinMeter: 20,
+  copperWireinMeter: 0.50,
   rentedBuilding: 10000,
   factories: 10000,
 });
@@ -155,3 +150,16 @@ export const perkState = reactive({
 export const selectedContinent = reactive({
   name: "No continent selected",
 });
+
+// Computados para somar separadamente
+export const totalFactories = computed(() =>
+  Object.values(continentRealEstate).reduce((sum, continent) => sum + continent.factories, 0)
+);
+
+export const totalAvailableBuildings = computed(() =>
+  Object.values(continentRealEstate).reduce((sum, continent) => sum + continent.availableBuildings, 0)
+);
+
+export const totalRentedBuildings = computed(() =>
+  Object.values(continentRealEstate).reduce((sum, continent) => sum + continent.rentedBuildings, 0)
+);
