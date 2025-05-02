@@ -7,14 +7,19 @@ let interval = null
 
 onMounted(() => {
   console.log('✅ Tick handler montado')
-  interval = setInterval(() => {
-    gameState.isPaused ? null : gameState.ticks++;
-  }, 1000)
+  // Use requestAnimationFrame and check visibility
+  const handleTick = () => {
+    if (!document.hidden && !gameState.isPaused) {
+      gameState.ticks++;
+    }
+    interval = requestAnimationFrame(handleTick);
+  }
+  interval = requestAnimationFrame(handleTick);
 })
 
 onUnmounted(() => {
   console.log('🛑 Tick handler destruído')
-  clearInterval(interval)
+  cancelAnimationFrame(interval)
 })
 </script>
 

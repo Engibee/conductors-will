@@ -1,4 +1,4 @@
-import { ref, reactive, onMounted, onUnmounted, computed, watch } from "vue";
+import { ref, reactive, shallowReactive, onMounted, onUnmounted, computed, watch } from "vue";
 
 //STOCK HANDLE
 export const gameState = reactive({
@@ -77,7 +77,7 @@ export const continentRealEstate = reactive({
   },
 });
 
-export const chart = reactive({
+export const chart = shallowReactive({
   chartLabel: [],
   chartData: [],
 });

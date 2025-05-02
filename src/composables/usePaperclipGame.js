@@ -20,11 +20,20 @@ let intervalo = null;
 
 export function usePaperclipGame() {
   onMounted(() => {
-    setInterval(() => {
+    // Use requestAnimationFrame instead of setInterval for better performance
+    let lastTime = 0;
+    const gameLoop = (timestamp) => {
       if (!gameState.isPaused) {
-        update_tick();
+        // Calculate delta time to handle varying frame rates
+        const deltaTime = timestamp - lastTime;
+        if (deltaTime >= 1000) { // 1 second passed
+          update_tick();
+          lastTime = timestamp;
+        }
       }
-    }, 1000);
+      requestAnimationFrame(gameLoop);
+    };
+    requestAnimationFrame(gameLoop);
     checkStakeGameBegin() ? generateInitialStakeholding() : null;
     console.log(`O contador foi montado.`);
     clearGame();
@@ -58,15 +67,7 @@ export function usePaperclipGame() {
     if (ticks_events(1)) {
       generateOrePerStake();
       automation_handler();
-      saveGame({
-        state: toRaw(gameState),
-        perkState: toRaw(perkState),
-        selectedContinent: toRaw(selectedContinent),
-        chartInstance: toRaw(chart),
-        continentRealEstate: toRaw(continentRealEstate),
-        stakeHoldingTrading: toRaw(stakeHoldingTrading),
-        resourcesValue: toRaw(resourcesValue),
-      });
+      throttledSave();
     }
   };
 
@@ -105,6 +106,11 @@ export function usePaperclipGame() {
   }
 
   function chartUpdate(newSale, month) {
+    // Limit chart data points to prevent performance issues
+    if (chart.chartLabel.length > 50) {
+      chart.chartLabel.shift();
+      chart.chartData.shift();
+    }
     chart.chartLabel.push(month);
     chart.chartData.push(newSale);
   }
@@ -118,6 +124,10 @@ export function usePaperclipGame() {
     logMessage("Monthly receipt updated!");
   }
   function logMessage(message) {
+    // Limit log size to prevent memory issues
+    if (gameState.logs.length > 50) {
+      gameState.logs.shift(); // Remove oldest log
+    }
     gameState.logs.push(`[${new Date().toLocaleTimeString()}] ${message}`);
   }
   function automation_handler() {
@@ -201,7 +211,9 @@ export function usePaperclipGame() {
     return priceFactor * marketingBonus * externalModifier;
   }
 
+  // Cache expensive calculations
   const currentDemand = computed(() => {
+    // This calculation runs on every render
     return buy_chance(
       gameState.priceOfCopper,
       gameState.marketing,
@@ -249,6 +261,23 @@ export function usePaperclipGame() {
       gameState.priceOfCopper -= 0.01;
       gameState.priceOfCopper = Math.max(0, gameState.priceOfCopper);
     }
+  }
+  // Throttle save operations
+  let saveTimeout = null;
+  function throttledSave() {
+    if (saveTimeout) return;
+    saveTimeout = setTimeout(() => {
+      saveGame({
+        state: toRaw(gameState),
+        perkState: toRaw(perkState),
+        selectedContinent: toRaw(selectedContinent),
+        chartInstance: toRaw(chart),
+        continentRealEstate: toRaw(continentRealEstate),
+        stakeHoldingTrading: toRaw(stakeHoldingTrading),
+        resourcesValue: toRaw(resourcesValue),
+      });
+      saveTimeout = null;
+    }, 5000); // Save at most every 5 seconds
   }
   return {
     currentDemand,

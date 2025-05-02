@@ -13,10 +13,20 @@ import PerkCard from "./components/PerkCards.vue";
 import TickHandler from "./components/TickHandler.vue";
 import WorldMap from "./components/WorldMap.vue";
 import GameChart from "./components/SellChart.vue";
-import RealEstate from "./components/RealEstate.vue";
-import Stakeholding from "./components/Stakeholding.vue";
-import StakeTrading from "./components/StakeTrading.vue";
+import { defineAsyncComponent } from 'vue';
 import { formatPrice, formatDate } from "./utils/helpers/format.js";
+
+// Components that can be lazy-loaded
+const RealEstate = defineAsyncComponent(() => 
+  import("./components/RealEstate.vue")
+);
+const Stakeholding = defineAsyncComponent(() => 
+  import("./components/Stakeholding.vue")
+);
+const StakeTrading = defineAsyncComponent(() => 
+  import("./components/StakeTrading.vue")
+);
+
 const {
   currentDemand,
   makeCopperWire,
@@ -37,7 +47,8 @@ const {
       <StakeTrading />
     </div>
   </div>
-  <div class="top-bar">
+  <!-- For static or rarely changing parts -->
+  <div v-memo="[gameState.isPaused]" class="top-bar">
     <div class="totalCopper">
       Copper Wire made: {{ gameState.lifeTimeCopperWire.toLocaleString() }}m
     </div>
