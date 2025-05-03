@@ -224,19 +224,69 @@ h4 {
 }
 
 .card.automation {
-  grid-column: 2; /* Fica na primeira coluna */
-  grid-row: 1; /* Fica na primeira linha */
-  width: 500px;
-  height: 120px;
+  grid-column: 2;
+  grid-row: 1;
+  width: 290px; /* Halved from 500px */
+  height: 133px;
   margin-left: 10px;
   text-align: justify;
-  padding-top: 0;
+  padding: 10px; /* Reduced padding */
   line-height: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card.refinery {
+  grid-column: 2;
+  grid-row: 1;
+  width: 290px; /* Same width as automation */
+  height: 133px;
+  margin-left: 265px; /* Position to the right of automation */
+  text-align: justify;
+  padding: 10px;
+  line-height: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .autoinfo {
   display: flex;
-  gap: 50px;
+  flex-direction: column; /* Stack elements vertically */
+  gap: 5px; /* Reduced gap */
+  align-items: flex-start; /* Align to the left */
+  margin-bottom: 5px;
+}
+
+.refinery-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: flex-start;
+  margin-bottom: 5px;
+}
+
+/* Compact elements */
+.card.automation h3, .card.refinery h3 {
+  margin-top: 0;
+  margin-bottom: 5px;
+  font-size: 1rem;
+}
+
+.card.automation button, .card.refinery button {
+  padding: 0.3em 0.6em;
+  font-size: 0.8em;
+}
+
+.card.automation p, .card.refinery p {
+  margin: 2px 0;
+  font-size: 0.8em;
+}
+
+/* Add horizontal layout for button groups */
+.button-group {
+  display: flex;
+  gap: 5px;
+  align-items: center;
 }
 
 .card.business {
@@ -258,7 +308,8 @@ h4 {
 }
 
 .mini_info {
-  font-size: 12px;
+  font-size: 0.7em !important;
+  margin-top: auto !important; /* Push to bottom */
 }
 
 .card.terminal {

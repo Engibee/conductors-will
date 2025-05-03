@@ -1,4 +1,4 @@
-import { onMounted, onUnmounted, computed, toRaw } from "vue";
+import { onMounted, onUnmounted, computed, toRaw, watch } from "vue";
 import { saveGame, loadGame, clearGame } from "./localStorage";
 import { formatDate } from "../utils/helpers/format.js";
 import { checkStakeGameBegin } from "../utils/helpers/checkers.js";
@@ -20,23 +20,10 @@ let intervalo = null;
 
 export function usePaperclipGame() {
   onMounted(() => {
-    // Use requestAnimationFrame instead of setInterval for better performance
-    let lastTime = 0;
-    const gameLoop = (timestamp) => {
-      if (!gameState.isPaused) {
-        // Calculate delta time to handle varying frame rates
-        const deltaTime = timestamp - lastTime;
-        if (deltaTime >= 1000) { // 1 second passed
-          update_tick();
-          lastTime = timestamp;
-        }
-      }
-      requestAnimationFrame(gameLoop);
-    };
-    requestAnimationFrame(gameLoop);
     checkStakeGameBegin() ? generateInitialStakeholding() : null;
     console.log(`O contador foi montado.`);
-    clearGame();
+    
+    // Load game data
     const data = loadGame();
     if (data) {
       Object.assign(gameState, data.state);
@@ -54,6 +41,14 @@ export function usePaperclipGame() {
     console.log(`O contador foi limpado/destruído.`);
   });
 
+  // Watch for tick changes instead of creating them
+  watch(() => gameState.ticks, (newTicks, oldTicks) => {
+    if (newTicks !== oldTicks) {
+      update_tick();
+      console.log(gameState.ticks);
+    }
+  });
+
   const update_tick = () => {
     if (ticks_events(40)) {
       rentedBuildingHandler();
@@ -67,6 +62,9 @@ export function usePaperclipGame() {
     if (ticks_events(1)) {
       generateOrePerStake();
       automation_handler();
+      if (perkState.hasRefinery) {
+        refinery_handler();
+      }
       throttledSave();
     }
   };
@@ -279,6 +277,30 @@ export function usePaperclipGame() {
       saveTimeout = null;
     }, 5000); // Save at most every 5 seconds
   }
+  // Add this function to handle refinery workers
+  function assignRefinery() {
+    // If we have available workers, assign one to refinery
+    if (gameState.workers > 0) {
+      gameState.workers--;
+      gameState.refiners = (gameState.refiners || 0) + 1;
+    }
+  }
+
+  // Update the refinery logic in your tick handler
+  function refinery_handler() {
+    if (gameState.refiners && gameState.refiners > 0) {
+      const maxRefine = Math.min(
+        gameState.availableCopperOre, 
+        gameState.refiners * 100
+      );
+      
+      if (maxRefine >= 100) {
+        const batches = Math.floor(maxRefine / 100);
+        gameState.availableCopperOre -= batches * 100;
+        gameState.availableCopper += batches;
+      }
+    }
+  }
   return {
     currentDemand,
     makeCopperWire,
@@ -290,5 +312,6 @@ export function usePaperclipGame() {
     decreasePrice,
     increaseBulk,
     decreaseBulk,
+    assignRefinery, // Add this to the returned functions
   };
 }

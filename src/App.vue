@@ -96,20 +96,32 @@ const {
     </div>
     <transition name="fade-slide">
       <div v-if="perkState.hasMachinery" class="card automation">
-        <h3>Automation</h3>
+        <h3>Wire Production</h3>
         <div class="autoinfo">
-          <button @click="buy_worker">Buy worker</button>
+          <div class="button-group">
+            <button @click="buy_worker">Hire</button>
+            <p>Workers: {{ gameState.workers }}</p>
+          </div>
           <p>Price: ${{ formatPrice(gameState.workersPrice) }}</p>
-          <p>
-            Amount of workers:
-            {{ gameState.workers + totalFactories * 100 }} (+{{
-              totalFactories * 100
-            }})
-          </p>
+          <p>Total: {{ gameState.workers + totalFactories * 100 }} (+{{
+            totalFactories * 100
+          }} in factories)</p>
         </div>
-        <p class="mini_info">Generates 1 meter of copper per tick(second)</p>
+        <p class="mini_info">Makes 1m wire per worker per tick</p>
       </div>
     </transition>
+    <div v-if="perkState.hasRefinery" class="card refinery">
+      <h3>Copper Refinery</h3>
+      <div class="refinery-info">
+        <div class="button-group">
+          <button @click="assignRefinery">Assign</button>
+          <p>Refiners: {{ gameState.refiners || 0 }}</p>
+        </div>
+        <p>Ore: {{ (gameState.availableCopperOre).toFixed(3) }}</p>
+        <p>Refined: {{ formatPrice(gameState.availableCopper) }} kg</p>
+      </div>
+      <p class="mini_info">Refines 100 ore to 1kg copper per worker</p>
+    </div>
     <div class="card terminal">
       <div class="time">
         📅 Week: {{ gameState.week }} | 📆 Month:
@@ -218,8 +230,7 @@ const {
       </div>
     </div>
     <div v-if="perkState.hasRefinery" class="mining-info">
-      Global ore: {{ gameState.globalCopperOre.toLocaleString() }} Available
-      ore: {{ (gameState.availableCopperOre).toFixed(3) }}
+      Global ore: {{ gameState.globalCopperOre.toLocaleString() }}
     </div>
   </div>
 </template>

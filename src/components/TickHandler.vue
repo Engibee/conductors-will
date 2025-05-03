@@ -4,16 +4,23 @@ import { onMounted, onUnmounted } from 'vue'
 import { gameState } from '../composables/gameState.js'
 
 let interval = null
+let lastTime = 0
 
 onMounted(() => {
   console.log('✅ Tick handler montado')
-  // Use requestAnimationFrame and check visibility
-  const handleTick = () => {
+  
+  const handleTick = (timestamp) => {
     if (!document.hidden && !gameState.isPaused) {
-      gameState.ticks++;
+      // Calculate delta time to handle varying frame rates
+      const deltaTime = timestamp - lastTime;
+      if (deltaTime >= 1000) { // Ensure 1 second has passed
+        gameState.ticks++;
+        lastTime = timestamp;
+      }
     }
     interval = requestAnimationFrame(handleTick);
   }
+  
   interval = requestAnimationFrame(handleTick);
 })
 
