@@ -2,19 +2,21 @@
 <script setup>
 import { onMounted, onUnmounted } from 'vue'
 import { gameState } from '../composables/gameState.js'
+import { useGameStore } from '../stores/gameStore.js'
 
 let interval = null
+const game = useGameStore()
 let lastTime = 0
 
 onMounted(() => {
   console.log('✅ Tick handler montado')
   
   const handleTick = (timestamp) => {
-    if (!document.hidden && !gameState.isPaused) {
+    if (!document.hidden && !game.isPaused) {
       // Calculate delta time to handle varying frame rates
       const deltaTime = timestamp - lastTime;
       if (deltaTime >= 1000) { // Ensure 1 second has passed
-        gameState.ticks++;
+        game.ticks++;
         lastTime = timestamp;
       }
     }

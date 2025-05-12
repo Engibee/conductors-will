@@ -1,22 +1,26 @@
 import { ref, reactive, onMounted, onUnmounted, computed, watch } from "vue";
-import { gameState } from "./gameState";
+import { useGameStore } from "../stores/gameStore.js";
+import { usePerkStore } from "../stores/perkStore.js";
 import { perkState } from "./gameState";
 
 export function buyPerk(perk) {
+  const game = useGameStore();
+  const perks = usePerkStore();
+
   if (perk === "machinery") {
-    perkState.hasMachinery = true;
+    perks.hasMachinery = true;
   }
   if (perk === "contract-provider") {
-    perkState.hasContractProvider = true;
+    perks.hasContractProvider = true;
   }
   if (perk === "real-estate") {
-    perkState.hasRealEstate = true;
+    perks.hasRealEstate = true;
   }
   if (perk === "patent-logo") {
-    perkState.hasPatentLogo = true;
-    gameState.maxSaleModifier += 0.1;
+    perks.hasPatentLogo = true;
+    game.maxSaleModifier += 0.1;
   }
   if (perk === "refinery") {
-    perkState.hasRefinery = true;
+    perks.hasRefinery = true;
   }
 }

@@ -1,12 +1,15 @@
 import { gameState, stakeHoldingTrading } from "../../composables/gameState.js";
+import { useGameStore } from "../../stores/gameStore.js";
 
 export function canAfford(price) {
-  return gameState.funds >= price;
+  const game = useGameStore();
+  return game.funds >= price;
 }
 
 export function spend(price) {
+  const game = useGameStore();
   if (canAfford(price)) {
-    gameState.funds -= price;
+    game.funds -= price;
     return true;
   } else {
     return false;

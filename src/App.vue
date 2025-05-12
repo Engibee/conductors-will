@@ -4,11 +4,14 @@ import {
   gameState,
   perkState,
   selectedContinent,
-  chart,
   totalAvailableBuildings,
   totalFactories,
   totalRentedBuildings,
 } from "./composables/gameState.js";
+import { useGameStore } from "./stores/gameStore.js";
+import { useContinentRealEstateStore } from "./stores/realEstateStore.js";
+import { useChartStore } from "./stores/chartStore.js";
+import { usePerkStore } from "./stores/perkStore.js";
 import PerkCard from "./components/PerkCards.vue";
 import TickHandler from "./components/TickHandler.vue";
 import WorldMap from "./components/WorldMap.vue";
@@ -38,50 +41,55 @@ const {
   increaseBulk,
   decreaseBulk,
 } = usePaperclipGame();
+
+const game = useGameStore();
+const realEstate = useContinentRealEstateStore();
+const chart = useChartStore();
+const perks = usePerkStore();
 </script>
 
 <template>
   <TickHandler />
-  <div v-if="gameState.isStakeModalOpen" class="modal-overlay">
+  <div v-if="game.isStakeModalOpen" class="modal-overlay">
     <div class="modal-window">
       <StakeTrading />
     </div>
   </div>
   <!-- For static or rarely changing parts -->
-  <div v-memo="[gameState.isPaused]" class="top-bar">
+  <div class="top-bar">
     <div class="totalCopper">
-      Copper Wire made: {{ gameState.lifeTimeCopperWire.toLocaleString() }}m
+      Copper Wire made: {{ game.lifeTimeCopperWire.toLocaleString() }}m
     </div>
   </div>
   <div class="containers">
     <div class="card business">
-      <h3>Stock: {{ gameState.copperWireinMeter }} meters</h3>
+      <h3>Stock: {{ game.copperWireinMeter }} meters</h3>
       <button @click="makeCopperWire">Make Copper Wire</button>
 
       <h5>Business</h5>
-      <p>💵Funds: ${{ formatPrice(gameState.funds).toLocaleString() }}</p>
+      <p>💵Funds: ${{ formatPrice(game.funds).toLocaleString() }}</p>
       <p class="sellprice">
         <button @click="decreasePrice" class="small-btn">-</button>
         <button @click="increasePrice" class="small-btn">+</button>
-        Selling price: ${{ formatPrice(gameState.priceOfCopper) }}
+        Selling price: ${{ formatPrice(game.priceOfCopper) }}
       </p>
       <p>
         Demand: <strong>{{ formatPrice(currentDemand) }}</strong>
       </p>
-      <p>Refined Copper: {{ formatPrice(gameState.availableCopper) }} kg</p>
+      <p>Refined Copper: {{ formatPrice(game.availableCopper) }} kg</p>
       <div class="commodity">
         <button
-          v-if="perkState.hasContractProvider"
+          v-if="perks.hasContractProvider"
           @click="decreaseBulk"
           class="bulk-button"
         >
           -
         </button>
         <button @click="buy_refined_copper">
-          Buy Ref. Copper x {{ gameState.copperBulkAmount }}
+          Buy Ref. Copper x {{ game.copperBulkAmount }}
         </button>
         <button
-          v-if="perkState.hasContractProvider"
+          v-if="perks.hasContractProvider"
           @click="increaseBulk"
           class="bulk-button"
         >
@@ -90,46 +98,46 @@ const {
       </div>
       <p class="mini_info">
         Price: ${{
-          formatPrice(gameState.kgOfCopper * gameState.copperBulkAmount)
+          formatPrice(game.kgOfCopper * game.copperBulkAmount)
         }}
       </p>
     </div>
     <transition name="fade-slide">
-      <div v-if="perkState.hasMachinery" class="card automation">
+      <div v-if="perks.hasMachinery" class="card automation">
         <h3>Wire Production</h3>
         <div class="autoinfo">
           <div class="button-group">
             <button @click="buy_worker">Hire</button>
-            <p>Workers: {{ gameState.workers }}</p>
+            <p>Workers: {{ game.workers }}</p>
           </div>
-          <p>Price: ${{ formatPrice(gameState.workersPrice) }}</p>
-          <p>Total: {{ gameState.workers + totalFactories * 100 }} (+{{
-            totalFactories * 100
+          <p>Price: ${{ formatPrice(game.workersPrice) }}</p>
+          <p>Total: {{ game.workers + realEstate.totalFactories * 100 }} (+{{
+            realEstate.totalFactories * 100
           }} in factories)</p>
         </div>
         <p class="mini_info">Makes 1m wire per worker per tick</p>
       </div>
     </transition>
-    <div v-if="perkState.hasRefinery" class="card refinery">
+    <div v-if="perks.hasRefinery" class="card refinery">
       <h3>Copper Refinery</h3>
       <div class="refinery-info">
         <div class="button-group">
           <button @click="assignRefinery">Assign</button>
-          <p>Refiners: {{ gameState.refiners || 0 }}</p>
+          <p>Refiners: {{ game.refiners || 0 }}</p>
         </div>
-        <p>Ore: {{ (gameState.availableCopperOre).toFixed(3) }}</p>
-        <p>Refined: {{ formatPrice(gameState.availableCopper) }} kg</p>
+        <p>Ore: {{ (game.availableCopperOre).toFixed(3) }}</p>
+        <p>Refined: {{ formatPrice(game.availableCopper) }} kg</p>
       </div>
       <p class="mini_info">Refines 100 ore to 1kg copper per worker</p>
     </div>
     <div class="card terminal">
       <div class="time">
-        📅 Week: {{ gameState.week }} | 📆 Month:
-        {{ formatDate(gameState.month) }} | 📅 Year:
-        {{ gameState.year }}
+        📅 Week: {{ game.week }} | 📆 Month:
+        {{ formatDate(game.month) }} | 📅 Year:
+        {{ game.year }}
       </div>
       <div
-        v-for="(msg, index) in gameState.logs"
+        v-for="(msg, index) in game.logs"
         :key="index"
         class="log-message"
       >
@@ -143,7 +151,7 @@ const {
       :class="{
         card: true,
         lab: true,
-        'lab-moved': perkState.hasMachinery,
+        'lab-moved': perks.hasMachinery,
       }"
     >
       <h4 class="labtitle">Lab Research</h4>
@@ -151,26 +159,26 @@ const {
         <div class="marketing-bar">
           <div
             class="marketing-fill"
-            :style="{ height: gameState.marketing + '%' }"
+            :style="{ height: game.marketing + '%' }"
           ></div>
         </div>
         <div class="marketing-info">
-          <p>Marketing: {{ gameState.marketing }}%</p>
+          <p>Marketing: {{ game.marketing }}%</p>
           <button @click="buy_marketing">Buy</button>
-          <p>Price: ${{ formatPrice(gameState.marketingPrice) }}</p>
+          <p>Price: ${{ formatPrice(game.marketingPrice) }}</p>
         </div>
       </div>
       <div class="perks-container">
         <div class="industrial-perks">
           <PerkCard
-            v-if="!perkState.hasMachinery && gameState.lifeTimeCopperWire >= 0"
+            v-if="!perks.hasMachinery && game.lifeTimeCopperWire >= 0"
             perk-id="machinery"
             title="Garage Factory"
             description="Automatize the production of copper wire."
             :price="100.0"
           />
           <PerkCard
-            v-if="perkState.hasMachinery && !perkState.hasRealEstate"
+            v-if="perks.hasMachinery && !perks.hasRealEstate"
             perk-id="real-estate"
             title="Invest in Real Estate"
             description="Buy buildings for a bigger production."
@@ -178,9 +186,9 @@ const {
           />
           <PerkCard
             v-if="
-              perkState.hasMachinery &&
-              perkState.hasRealEstate &&
-              !perkState.hasRefinery
+              perks.hasMachinery &&
+              perks.hasRealEstate &&
+              !perks.hasRefinery
             "
             perk-id="refinery"
             title="Build a refinery"
@@ -191,8 +199,8 @@ const {
         <div class="commodity-perks">
           <PerkCard
             v-if="
-              !perkState.hasContractProvider &&
-              gameState.lifeTimeCopperWire >= 0
+              !perks.hasContractProvider &&
+              game.lifeTimeCopperWire >= 0
             "
             perk-id="contract-provider"
             title="Contract with a provider"
@@ -202,7 +210,7 @@ const {
         </div>
         <div class="marketing-perks">
           <PerkCard
-            v-if="!perkState.hasPatentLogo && gameState.lifeTimeCopperWire >= 0"
+            v-if="!perks.hasPatentLogo && game.lifeTimeCopperWire >= 0"
             perk-id="patent-logo"
             title="Patent your logo"
             description="Secure your brand identity and increase your market value."
@@ -212,25 +220,25 @@ const {
         <div class="innovation-perks"></div>
       </div>
     </div>
-    <div v-if="perkState.hasRealEstate" class="world-map-container">
+    <div v-if="perks.hasRealEstate" class="world-map-container">
       <WorldMap />
     </div>
-    <div v-if="perkState.hasRealEstate" class="world-map-info">
+    <div v-if="perks.hasRealEstate" class="world-map-info">
       <div
-        v-if="selectedContinent.name != 'No continent selected'"
+        v-if="realEstate.selectedContinent.name != 'No continent selected'"
         class="real-estate"
       >
         <RealEstate />
       </div>
       <div
-        v-if="selectedContinent.name != 'No continent selected'"
+        v-if="realEstate.selectedContinent.name != 'No continent selected'"
         class="stakeholding"
       >
         <Stakeholding />
       </div>
     </div>
-    <div v-if="perkState.hasRefinery" class="mining-info">
-      Global ore: {{ gameState.globalCopperOre.toLocaleString() }}
+    <div v-if="perks.hasRefinery" class="mining-info">
+      Global ore: {{ game.globalCopperOre.toLocaleString() }}
     </div>
   </div>
 </template>

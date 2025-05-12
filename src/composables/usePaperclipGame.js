@@ -7,7 +7,6 @@ import {
   gameState,
   perkState,
   selectedContinent,
-  chart,
   continentRealEstate,
   stakeHoldingTrading,
   resourcesValue,
@@ -15,6 +14,9 @@ import {
   totalAvailableBuildings,
   totalRentedBuildings,
 } from "./gameState.js";
+import { useGameStore } from "../stores/gameStore.js";
+import { useContinentRealEstateStore } from "../stores/realEstateStore.js";
+import { useChartStore } from "../stores/chartStore.js";
 
 let intervalo = null;
 
@@ -22,7 +24,7 @@ export function usePaperclipGame() {
   onMounted(() => {
     checkStakeGameBegin() ? generateInitialStakeholding() : null;
     console.log(`O contador foi montado.`);
-    
+    clearGame();
     // Load game data
     const data = loadGame();
     if (data) {
@@ -41,11 +43,15 @@ export function usePaperclipGame() {
     console.log(`O contador foi limpado/destruído.`);
   });
 
+  const game = useGameStore();
+  const realEstate = useContinentRealEstateStore();
+  const chart = useChartStore();
+
   // Watch for tick changes instead of creating them
-  watch(() => gameState.ticks, (newTicks, oldTicks) => {
+  watch(() => game.ticks, (newTicks, oldTicks) => {
     if (newTicks !== oldTicks) {
       update_tick();
-      console.log(gameState.ticks);
+      console.log(game.ticks);
     }
   });
 
@@ -72,13 +78,13 @@ export function usePaperclipGame() {
   function generateOrePerStake() {
     const oreTransaction = Math.pow(stakeHoldingTrading.You, 1.1) * 1000;
 
-    gameState.availableCopperOre += oreTransaction;
-    gameState.globalCopperOre -= oreTransaction;
+    game.availableCopperOre += oreTransaction;
+    game.globalCopperOre -= oreTransaction;
 
     if (perkState.hasRefinery){
-      if (gameState.availableCopperOre >= 100){
-        gameState.availableCopperOre -= 100;
-        gameState.availableCopper += 1;
+      if (game.availableCopperOre >= 100){
+        game.availableCopperOre -= 100;
+        game.availableCopper += 1;
       }
     }
   }
@@ -115,83 +121,83 @@ export function usePaperclipGame() {
 
   function monthly_sale_graphs_handler() {
     chartUpdate(
-      gameState.monthlySale,
-      formatDate(gameState.month, gameState.year)
+      game.monthlySale,
+      formatDate(game.month, game.year)
     );
-    gameState.monthlySale = 0;
+    game.monthlySale = 0;
     logMessage("Monthly receipt updated!");
   }
   function logMessage(message) {
     // Limit log size to prevent memory issues
-    if (gameState.logs.length > 50) {
-      gameState.logs.shift(); // Remove oldest log
+    if (game.logs.length > 50) {
+      game.logs.shift(); // Remove oldest log
     }
-    gameState.logs.push(`[${new Date().toLocaleTimeString()}] ${message}`);
+    game.logs.push(`[${new Date().toLocaleTimeString()}] ${message}`);
   }
   function automation_handler() {
     if (
-      gameState.availableCopper >=
-      gameState.copperQtPerMeter *
-        (gameState.workers + totalFactories.value * 100)
+      game.availableCopper >=
+      game.copperQtPerMeter *
+        (game.workers + realEstate.totalFactories * 100)
     ) {
-      gameState.copperWireinMeter +=
-        1 * (gameState.workers + totalFactories.value * 100);
-      gameState.lifeTimeCopperWire +=
-        1 * (gameState.workers + totalFactories.value * 100);
-      gameState.availableCopper -=
+      game.copperWireinMeter +=
+        1 * (game.workers + realEstate.totalFactories * 100);
+      game.lifeTimeCopperWire +=
+        1 * (game.workers + realEstate.totalFactories * 100);
+      game.availableCopper -=
         1 *
-        (gameState.workers + totalFactories.value * 100) *
-        gameState.copperQtPerMeter;
+        (game.workers + realEstate.totalFactories * 100) *
+        game.copperQtPerMeter;
     }
   }
   function buy_refined_copper() {
-    transaction.spend(gameState.kgOfCopper * gameState.copperBulkAmount)
-      ? (gameState.availableCopper += 1.0 * gameState.copperBulkAmount)
+    transaction.spend(game.kgOfCopper * game.copperBulkAmount)
+      ? (game.availableCopper += 1.0 * game.copperBulkAmount)
       : alert("Not enough funds to buy this amount.");
   }
   function increaseBulk() {
-    if (gameState.copperBulkAmount < 10) {
-      gameState.copperBulkAmount++;
+    if (game.copperBulkAmount < 10) {
+      game.copperBulkAmount++;
     }
   }
 
   function decreaseBulk() {
-    if (gameState.copperBulkAmount >= 2) {
-      gameState.copperBulkAmount--;
+    if (game.copperBulkAmount >= 2) {
+      game.copperBulkAmount--;
     }
   }
   function buy_worker() {
-    transaction.spend(gameState.workersPrice)
-      ? gameState.workers++
+    transaction.spend(game.workersPrice)
+      ? game.workers++
       : alert("Not enough funds to hire more workers.");
   }
   function buy_marketing() {
-    transaction.spend(gameState.marketingPrice)
-      ? gameState.marketing++
+    transaction.spend(game.marketingPrice)
+      ? game.marketing++
       : alert("Not enough funds to invest in marketing.");
-    gameState.marketingPrice = getMarketingPrice(gameState.marketing);
+    game.marketingPrice = getMarketingPrice(game.marketing);
   }
   function getMarketingPrice(marketingLevel) {
     return Math.floor(10 * Math.pow(marketingLevel, 3));
   }
   function time_handler() {
-    if (gameState.month == 12 && gameState.week == 4) {
+    if (game.month == 12 && game.week == 4) {
       monthly_sale_graphs_handler();
-      gameState.year++;
-      gameState.month = 1;
-      gameState.week = 1;
-    } else if (gameState.week == 4) {
+      game.year++;
+      game.month = 1;
+      game.week = 1;
+    } else if (game.week == 4) {
       monthly_sale_graphs_handler();
-      gameState.month++;
-      gameState.week = 1;
+      game.month++;
+      game.week = 1;
     } else {
-      gameState.week++;
+      game.week++;
     }
   }
   function rentedBuildingHandler() {
     if (perkState.hasRealEstate && totalRentedBuildings.value > 0) {
-      gameState.funds += totalRentedBuildings.value * 200;
-      gameState.monthlySale += totalRentedBuildings.value * 200;
+      game.funds += totalRentedBuildings.value * 200;
+      game.monthlySale += totalRentedBuildings.value * 200;
       logMessage(
         `Your monthly rent income: $${(
           totalRentedBuildings.value * 200
@@ -200,7 +206,7 @@ export function usePaperclipGame() {
     }
   }
   function ticks_events(tick) {
-    return gameState.ticks % tick === 0;
+    return game.ticks % tick === 0;
   }
 
   function buy_chance(price, marketing = 0, externalModifier = 1) {
@@ -213,51 +219,51 @@ export function usePaperclipGame() {
   const currentDemand = computed(() => {
     // This calculation runs on every render
     return buy_chance(
-      gameState.priceOfCopper,
-      gameState.marketing,
-      gameState.demandModifier ?? 1
+      game.priceOfCopper,
+      game.marketing,
+      game.demandModifier ?? 1
     );
   });
 
   function buy_simulation_per_tick() {
-    const marketingLevel = gameState.marketing;
+    const marketingLevel = game.marketing;
 
     const maxSales =
-      (99.999 * Math.pow(marketingLevel, 2) + 10) * gameState.maxSaleModifier;
+      (99.999 * Math.pow(marketingLevel, 2) + 10) * game.maxSaleModifier;
     const demand = currentDemand.value;
 
     const baseSales = maxSales * 0.5 * demand;
     const fluctuation = baseSales * (Math.random() * 0.2 - 0.1); // ±10%
     const estimatedSales = Math.max(0, Math.floor(baseSales + fluctuation));
 
-    const finalSales = Math.min(estimatedSales, gameState.copperWireinMeter);
+    const finalSales = Math.min(estimatedSales, game.copperWireinMeter);
 
     if (finalSales > 0) {
       console.log(
-        `Sold products: ${finalSales}, Max sale: ${maxSales}, Max sale factor: ${gameState.maxSaleModifier}`
+        `Sold products: ${finalSales}, Max sale: ${maxSales}, Max sale factor: ${game.maxSaleModifier}`
       );
-      gameState.copperWireinMeter -= finalSales;
+      game.copperWireinMeter -= finalSales;
 
-      const revenue = finalSales * gameState.priceOfCopper;
-      gameState.funds += revenue;
-      gameState.monthlySale += revenue;
+      const revenue = finalSales * game.priceOfCopper;
+      game.funds += revenue;
+      game.monthlySale += revenue;
     }
   }
 
   function makeCopperWire() {
-    if (gameState.availableCopper >= gameState.copperQtPerMeter) {
-      gameState.availableCopper -= gameState.copperQtPerMeter;
-      gameState.copperWireinMeter++;
-      gameState.lifeTimeCopperWire++;
+    if (game.availableCopper >= game.copperQtPerMeter) {
+      game.availableCopper -= game.copperQtPerMeter;
+      game.copperWireinMeter++;
+      game.lifeTimeCopperWire++;
     }
   }
   function increasePrice() {
-    gameState.priceOfCopper += 0.01;
+    game.priceOfCopper += 0.01;
   }
   function decreasePrice() {
-    if (gameState.priceOfCopper > Number.EPSILON) {
-      gameState.priceOfCopper -= 0.01;
-      gameState.priceOfCopper = Math.max(0, gameState.priceOfCopper);
+    if (game.priceOfCopper > Number.EPSILON) {
+      game.priceOfCopper -= 0.01;
+      game.priceOfCopper = Math.max(0, game.priceOfCopper);
     }
   }
   // Throttle save operations
@@ -280,24 +286,24 @@ export function usePaperclipGame() {
   // Add this function to handle refinery workers
   function assignRefinery() {
     // If we have available workers, assign one to refinery
-    if (gameState.workers > 0) {
-      gameState.workers--;
-      gameState.refiners = (gameState.refiners || 0) + 1;
+    if (game.workers > 0) {
+      game.workers--;
+      game.refiners = (game.refiners || 0) + 1;
     }
   }
 
   // Update the refinery logic in your tick handler
   function refinery_handler() {
-    if (gameState.refiners && gameState.refiners > 0) {
+    if (game.refiners && game.refiners > 0) {
       const maxRefine = Math.min(
-        gameState.availableCopperOre, 
-        gameState.refiners * 100
+        game.availableCopperOre, 
+        game.refiners * 100
       );
       
       if (maxRefine >= 100) {
         const batches = Math.floor(maxRefine / 100);
-        gameState.availableCopperOre -= batches * 100;
-        gameState.availableCopper += batches;
+        game.availableCopperOre -= batches * 100;
+        game.availableCopper += batches;
       }
     }
   }
