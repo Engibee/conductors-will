@@ -5,6 +5,10 @@ export const useChartStore = defineStore('chart', {
     chartLabel: [],
     chartData: [],
   }),
-
-  persist: true, // opcional, só se quiser manter dados após reload
+  actions: {
+    resetStore() {
+      this.$reset()
+    }
+  },
+  persist: true,
 })

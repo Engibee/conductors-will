@@ -51,6 +51,9 @@ export const useGameStore = defineStore("game", {
     resetLogs() {
       this.logs = [];
     },
+    resetStore() {
+      this.$reset()
+    },
   },
   persist: true,
 });

@@ -1,7 +1,5 @@
-import { ref, reactive, onMounted, onUnmounted, computed, watch } from "vue";
 import { useGameStore } from "../stores/gameStore.js";
 import { usePerkStore } from "../stores/perkStore.js";
-import { perkState } from "./gameState";
 
 export function buyPerk(perk) {
   const game = useGameStore();

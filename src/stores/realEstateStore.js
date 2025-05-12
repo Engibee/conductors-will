@@ -61,6 +61,10 @@ export const useContinentRealEstateStore = defineStore("continentRealEstate", {
         .map((key) => state[key].rentedBuildings)
         .reduce((sum, val) => sum + val, 0),
   },
-
+  actions: {
+    resetStore() {
+      this.$reset()
+    }
+  },
   persist: true,
 });

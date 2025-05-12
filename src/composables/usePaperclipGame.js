@@ -1,21 +1,13 @@
-import { onMounted, onUnmounted, computed, toRaw, watch } from "vue";
-import { saveGame, loadGame, clearGame } from "./localStorage";
+import { onMounted, onUnmounted, computed, watch } from "vue";
 import { formatDate } from "../utils/helpers/format.js";
 import { checkStakeGameBegin } from "../utils/helpers/checkers.js";
 import * as transaction from "../utils/helpers/transactionHandle.js";
 import {
-  gameState,
-  perkState,
-  selectedContinent,
-  continentRealEstate,
   stakeHoldingTrading,
-  resourcesValue,
-  totalFactories,
-  totalAvailableBuildings,
-  totalRentedBuildings,
 } from "./gameState.js";
 import { useGameStore } from "../stores/gameStore.js";
 import { useContinentRealEstateStore } from "../stores/realEstateStore.js";
+import { usePerkStore } from "../stores/perkStore.js";
 import { useChartStore } from "../stores/chartStore.js";
 
 let intervalo = null;
@@ -23,19 +15,8 @@ let intervalo = null;
 export function usePaperclipGame() {
   onMounted(() => {
     checkStakeGameBegin() ? generateInitialStakeholding() : null;
+    realEstate.selectedContinent.name = "No continent selected";
     console.log(`O contador foi montado.`);
-    clearGame();
-    // Load game data
-    const data = loadGame();
-    if (data) {
-      Object.assign(gameState, data.state);
-      Object.assign(perkState, data.perkState);
-      Object.assign(selectedContinent, data.selectedContinent);
-      Object.assign(chart, data.chartInstance);
-      Object.assign(continentRealEstate, data.continentRealEstate);
-      Object.assign(stakeHoldingTrading, data.stakeHoldingTrading);
-      Object.assign(resourcesValue, data.resourcesValue);
-    }
   });
   onUnmounted(() => {
     // Limpa o intervalo quando o componente for destruído
@@ -46,6 +27,7 @@ export function usePaperclipGame() {
   const game = useGameStore();
   const realEstate = useContinentRealEstateStore();
   const chart = useChartStore();
+  const perks = usePerkStore();
 
   // Watch for tick changes instead of creating them
   watch(() => game.ticks, (newTicks, oldTicks) => {
@@ -68,10 +50,9 @@ export function usePaperclipGame() {
     if (ticks_events(1)) {
       generateOrePerStake();
       automation_handler();
-      if (perkState.hasRefinery) {
+      if (perks.hasRefinery) {
         refinery_handler();
       }
-      throttledSave();
     }
   };
 
@@ -81,7 +62,7 @@ export function usePaperclipGame() {
     game.availableCopperOre += oreTransaction;
     game.globalCopperOre -= oreTransaction;
 
-    if (perkState.hasRefinery){
+    if (perks.hasRefinery){
       if (game.availableCopperOre >= 100){
         game.availableCopperOre -= 100;
         game.availableCopper += 1;
@@ -195,12 +176,12 @@ export function usePaperclipGame() {
     }
   }
   function rentedBuildingHandler() {
-    if (perkState.hasRealEstate && totalRentedBuildings.value > 0) {
-      game.funds += totalRentedBuildings.value * 200;
-      game.monthlySale += totalRentedBuildings.value * 200;
+    if (perks.hasRealEstate && realEstate.totalRentedBuildings > 0) {
+      game.funds += realEstate.totalRentedBuildings * 200;
+      game.monthlySale += realEstate.totalRentedBuildings * 200;
       logMessage(
         `Your monthly rent income: $${(
-          totalRentedBuildings.value * 200
+          realEstate.totalRentedBuildings * 200
         ).toLocaleString()}!`
       );
     }
@@ -265,23 +246,6 @@ export function usePaperclipGame() {
       game.priceOfCopper -= 0.01;
       game.priceOfCopper = Math.max(0, game.priceOfCopper);
     }
-  }
-  // Throttle save operations
-  let saveTimeout = null;
-  function throttledSave() {
-    if (saveTimeout) return;
-    saveTimeout = setTimeout(() => {
-      saveGame({
-        state: toRaw(gameState),
-        perkState: toRaw(perkState),
-        selectedContinent: toRaw(selectedContinent),
-        chartInstance: toRaw(chart),
-        continentRealEstate: toRaw(continentRealEstate),
-        stakeHoldingTrading: toRaw(stakeHoldingTrading),
-        resourcesValue: toRaw(resourcesValue),
-      });
-      saveTimeout = null;
-    }, 5000); // Save at most every 5 seconds
   }
   // Add this function to handle refinery workers
   function assignRefinery() {

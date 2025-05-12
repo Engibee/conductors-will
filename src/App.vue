@@ -1,13 +1,5 @@
 <script setup>
 import { usePaperclipGame } from "./composables/usePaperclipGame.js";
-import {
-  gameState,
-  perkState,
-  selectedContinent,
-  totalAvailableBuildings,
-  totalFactories,
-  totalRentedBuildings,
-} from "./composables/gameState.js";
 import { useGameStore } from "./stores/gameStore.js";
 import { useContinentRealEstateStore } from "./stores/realEstateStore.js";
 import { useChartStore } from "./stores/chartStore.js";

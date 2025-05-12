@@ -8,5 +8,10 @@ export const usePerkStore = defineStore('perk', {
     hasPatentLogo: false,
     hasRefinery: false,
   }),
-  persist: true, // Isso ativa o salvamento local com pinia-plugin-persistedstate
+  actions: {
+    resetStore() {
+      this.$reset()
+    }
+  },
+  persist: true,
 })
