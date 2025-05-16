@@ -2,20 +2,21 @@ import { onMounted, onUnmounted, computed, watch } from "vue";
 import { formatDate } from "../utils/helpers/format.js";
 import { checkStakeGameBegin } from "../utils/helpers/checkers.js";
 import * as transaction from "../utils/helpers/transactionHandle.js";
-import {
-  stakeHoldingTrading,
-} from "./gameState.js";
 import { useGameStore } from "../stores/gameStore.js";
-import { useContinentRealEstateStore } from "../stores/realEstateStore.js";
+import {
+  useContinentRealEstateStore,
+  useSelectedContinentStore,
+} from "../stores/realEstateStore.js";
 import { usePerkStore } from "../stores/perkStore.js";
 import { useChartStore } from "../stores/chartStore.js";
+import { useStakeHoldingTradingStore } from "../stores/stakeTrading.js";
 
 let intervalo = null;
 
 export function usePaperclipGame() {
   onMounted(() => {
     checkStakeGameBegin() ? generateInitialStakeholding() : null;
-    realEstate.selectedContinent.name = "No continent selected";
+    selectedContinent.name = "No continent selected";
     console.log(`O contador foi montado.`);
   });
   onUnmounted(() => {
@@ -26,16 +27,20 @@ export function usePaperclipGame() {
 
   const game = useGameStore();
   const realEstate = useContinentRealEstateStore();
+  const selectedContinent = useSelectedContinentStore();
   const chart = useChartStore();
   const perks = usePerkStore();
+  const stakeTrading = useStakeHoldingTradingStore();
 
   // Watch for tick changes instead of creating them
-  watch(() => game.ticks, (newTicks, oldTicks) => {
-    if (newTicks !== oldTicks) {
-      update_tick();
-      console.log(game.ticks);
+  watch(
+    () => game.ticks,
+    (newTicks, oldTicks) => {
+      if (newTicks !== oldTicks) {
+        update_tick();
+      }
     }
-  });
+  );
 
   const update_tick = () => {
     if (ticks_events(40)) {
@@ -46,9 +51,9 @@ export function usePaperclipGame() {
     }
     if (ticks_events(5)) {
       buy_simulation_per_tick();
+      generateOrePerStake();
     }
     if (ticks_events(1)) {
-      generateOrePerStake();
       automation_handler();
       if (perks.hasRefinery) {
         refinery_handler();
@@ -57,13 +62,13 @@ export function usePaperclipGame() {
   };
 
   function generateOrePerStake() {
-    const oreTransaction = Math.pow(stakeHoldingTrading.You, 1.1) * 1000;
+    const oreTransaction = Math.pow(stakeTrading.You, 1.1) * 1000;
 
     game.availableCopperOre += oreTransaction;
     game.globalCopperOre -= oreTransaction;
 
-    if (perks.hasRefinery){
-      if (game.availableCopperOre >= 100){
+    if (perks.hasRefinery) {
+      if (game.availableCopperOre >= 100) {
         game.availableCopperOre -= 100;
         game.availableCopper += 1;
       }
@@ -82,12 +87,12 @@ export function usePaperclipGame() {
     const total = randomValues.reduce((sum, val) => sum + val, 0);
 
     organizations.forEach((org, i) => {
-      stakeHoldingTrading[org].stake = parseFloat(
+      stakeTrading[org].stake = parseFloat(
         ((randomValues[i] / total) * 100).toFixed(2)
       );
     });
 
-    stakeHoldingTrading.You = 0.0;
+    stakeTrading.You = 0.0;
   }
 
   function chartUpdate(newSale, month) {
@@ -101,10 +106,7 @@ export function usePaperclipGame() {
   }
 
   function monthly_sale_graphs_handler() {
-    chartUpdate(
-      game.monthlySale,
-      formatDate(game.month, game.year)
-    );
+    chartUpdate(game.monthlySale, formatDate(game.month, game.year));
     game.monthlySale = 0;
     logMessage("Monthly receipt updated!");
   }
@@ -118,16 +120,15 @@ export function usePaperclipGame() {
   function automation_handler() {
     if (
       game.availableCopper >=
-      game.copperQtPerMeter *
-        (game.workers + realEstate.totalFactories * 100)
+      game.copperQtPerMeter * (game.wirers + realEstate.totalFactories * 50)
     ) {
       game.copperWireinMeter +=
-        1 * (game.workers + realEstate.totalFactories * 100);
+        1 * (game.wirers + realEstate.totalFactories * 50);
       game.lifeTimeCopperWire +=
-        1 * (game.workers + realEstate.totalFactories * 100);
+        1 * (game.wirers + realEstate.totalFactories * 50);
       game.availableCopper -=
         1 *
-        (game.workers + realEstate.totalFactories * 100) *
+        (game.wirers + realEstate.totalFactories * 50) *
         game.copperQtPerMeter;
     }
   }
@@ -149,8 +150,8 @@ export function usePaperclipGame() {
   }
   function buy_worker() {
     transaction.spend(game.workersPrice)
-      ? game.workers++
-      : alert("Not enough funds to hire more workers.");
+      ? game.wirers++
+      : alert("Not enough funds to hire more wirers.");
   }
   function buy_marketing() {
     transaction.spend(game.marketingPrice)
@@ -247,28 +248,23 @@ export function usePaperclipGame() {
       game.priceOfCopper = Math.max(0, game.priceOfCopper);
     }
   }
-  // Add this function to handle refinery workers
+  // Add this function to handle refinery wirers
   function assignRefinery() {
-    // If we have available workers, assign one to refinery
-    if (game.workers > 0) {
-      game.workers--;
-      game.refiners = (game.refiners || 0) + 1;
+    // If we have available wirers, assign one to refinery
+    if (game.wirers > 100) {
+      game.wirers +- 100;
+      game.refiners += 1;
+    }
+    else{
+      alert("You need 100 wirers to turn into a refiner.");
     }
   }
 
   // Update the refinery logic in your tick handler
   function refinery_handler() {
-    if (game.refiners && game.refiners > 0) {
-      const maxRefine = Math.min(
-        game.availableCopperOre, 
-        game.refiners * 100
-      );
-      
-      if (maxRefine >= 100) {
-        const batches = Math.floor(maxRefine / 100);
-        game.availableCopperOre -= batches * 100;
-        game.availableCopper += batches;
-      }
+    if (game.availableCopperOre >= (game.refiners + realEstate.totalFactories) * 100) {
+      game.availableCopper += (game.refiners + realEstate.totalFactories) * 100;
+      game.availableCopperOre -= (game.refiners + realEstate.totalFactories) * 100;
     }
   }
   return {

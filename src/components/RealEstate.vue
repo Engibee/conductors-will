@@ -1,26 +1,26 @@
 <template>
   <div
     v-if="
-      realEstate[realEstate.selectedContinent.name].license &&
-      realEstate.selectedContinent.name != 'No continent selected'
+      realEstate[selectedContinent.name].license &&
+      selectedContinent.name != 'No continent selected'
     "
   >
     <p class="real-state-info">
-      🏭Factories: {{ realEstate[realEstate.selectedContinent.name].factories }}
+      🏭Factories: {{ realEstate[selectedContinent.name].factories }}
       <button @click="increaseFactory" class="real-state-info-btn">
         Factorize
       </button>
     </p>
     <p class="real-state-info">
       🏚️Available Buildings:
-      {{ realEstate[realEstate.selectedContinent.name].availableBuildings }}
+      {{ realEstate[selectedContinent.name].availableBuildings }}
       <button @click="buyRealEstate" class="real-state-info-btn">
         Buy: $10,000
       </button>
     </p>
     <p class="real-state-info">
       🏘️Rented Buildings:
-      {{ realEstate[realEstate.selectedContinent.name].rentedBuildings }}
+      {{ realEstate[selectedContinent.name].rentedBuildings }}
       <button @click="increaseRentedBulding" class="real-state-info-btn">
         Rent
       </button>
@@ -29,20 +29,21 @@
 
   <div class="license-container" v-else>
     <button class="buy-license-btn" @click="buyLicense">
-      Unlock real estate in {{ realEstate.selectedContinent.name }} – $50,000
+      Unlock real estate in {{ selectedContinent.name }} – $50,000
     </button>
   </div>
 </template>
 
 <script setup>
-import { useContinentRealEstateStore } from "../stores/realEstateStore.js";
+import { useContinentRealEstateStore, useSelectedContinentStore } from "../stores/realEstateStore.js";
 import { spend } from "../utils/helpers/transactionHandle.js";
 
 const realEstate = useContinentRealEstateStore();
+const selectedContinent = useSelectedContinentStore();
 
 function buyLicense() {
   if (spend(50000)) {
-    realEstate[realEstate.selectedContinent.name].license = true;
+    realEstate[selectedContinent.name].license = true;
   } else {
     alert("Not enough funds to buy this license.");
   }
@@ -50,25 +51,25 @@ function buyLicense() {
 
 function buyRealEstate() {
   if (spend(10000)) {
-    realEstate[realEstate.selectedContinent.name].availableBuildings += 1;
+    realEstate[selectedContinent.name].availableBuildings += 1;
   } else {
     alert("Not enough funds to buy this real estate.");
   }
 }
 
 function increaseFactory() {
-  if (realEstate[realEstate.selectedContinent.name].availableBuildings > 0) {
-    realEstate[realEstate.selectedContinent.name].factories += 1;
-    realEstate[realEstate.selectedContinent.name].availableBuildings -= 1;
+  if (realEstate[selectedContinent.name].availableBuildings > 0) {
+    realEstate[selectedContinent.name].factories += 1;
+    realEstate[selectedContinent.name].availableBuildings -= 1;
   } else {
     alert("Not enough buildings to build a factory.");
   }
 }
 
 function increaseRentedBulding() {
-  if (realEstate[realEstate.selectedContinent.name].availableBuildings > 0) {
-    realEstate[realEstate.selectedContinent.name].rentedBuildings += 1;
-    realEstate[realEstate.selectedContinent.name].availableBuildings -= 1;
+  if (realEstate[selectedContinent.name].availableBuildings > 0) {
+    realEstate[selectedContinent.name].rentedBuildings += 1;
+    realEstate[selectedContinent.name].availableBuildings -= 1;
   } else {
     alert("Not enough buildings to rent.");
   }

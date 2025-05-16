@@ -1,12 +1,17 @@
 // src/stores/continentRealEstate.js
 import { defineStore } from "pinia";
 
-export const useContinentRealEstateStore = defineStore("continentRealEstate", {
+export const useSelectedContinentStore = defineStore('selectedContinent', {
   state: () => ({
     selectedContinent: {
       name: "No continent selected",
-    },
+    }
+  }),
+  persist: true,
+})
 
+export const useContinentRealEstateStore = defineStore("continentRealEstate", {
+  state: () => ({
     Asia: {
       availableBuildings: 0,
       factories: 0,

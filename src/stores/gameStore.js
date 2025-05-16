@@ -7,13 +7,15 @@ export const useGameStore = defineStore("game", {
     isStakeModalOpen: false,
 
     // STOCK HANDLE
-    funds: 999999,
+    funds: 300,
     lifeTimeCopperWire: 0,
     copperWireinMeter: 0,
     globalCopperOre: 1_000_000_000_000_000,
     availableCopper: 10,
     availableCopperOre: 0,
-    workers: 0,
+    idleWorkers: 0,
+    wirers: 0,
+    refiners: 0,
 
     // PRICES HANDLE
     copperQtPerMeter: 0.02232,

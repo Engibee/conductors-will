@@ -13,14 +13,18 @@
 import { onMounted, onBeforeUnmount, ref, watch, computed } from "vue";
 import Chart from "chart.js/auto";
 import zoomPlugin from "chartjs-plugin-zoom";
-import { gameState, stakeHoldingTrading } from "../composables/gameState";
+import { useGameStore } from "../stores/gameStore";
+import { useStakeHoldingTradingStore } from "../stores/stakeTrading";
+
+const stakeHoldingTradingStore = useStakeHoldingTradingStore();
+const game = useGameStore();
 
 function pause() {
-  if (stakeHoldingTrading.selectedOrganization !== "Nothing selected") {
-    gameState.isPaused
-      ? (gameState.isPaused = false)
-      : (gameState.isPaused = true);
-    gameState.isStakeModalOpen = true;
+  if (stakeHoldingTradingStore.selectedOrganization !== "Nothing selected") {
+    game.isPaused
+      ? (game.isPaused = false)
+      : (game.isPaused = true);
+    game.isStakeModalOpen = true;
   }
   else {
     alert("Please select an organization to trade with.");
@@ -28,11 +32,11 @@ function pause() {
 }
 
 const stakeData = computed(() => [
-  stakeHoldingTrading.Governments.stake,
-  stakeHoldingTrading.TechCorporations.stake,
-  stakeHoldingTrading.FinancialFunds.stake,
-  stakeHoldingTrading.NGOs.stake,
-  stakeHoldingTrading.You,
+  stakeHoldingTradingStore.Governments.stake,
+  stakeHoldingTradingStore.TechCorporations.stake,
+  stakeHoldingTradingStore.FinancialFunds.stake,
+  stakeHoldingTradingStore.NGOs.stake,
+  stakeHoldingTradingStore.You,
 ]);
 
 Chart.register(zoomPlugin);
@@ -158,8 +162,8 @@ function onChartClick(event) {
   if (points.length > 0) {
     const index = points[0].index;
     const label = chartInstance.data.labels[index];
-    stakeHoldingTrading.selectedOrganization = label;
-    console.log("Selected:", stakeHoldingTrading.selectedOrganization);
+    stakeHoldingTradingStore.selectedOrganization = label;
+    console.log("Selected:", stakeHoldingTradingStore.selectedOrganization);
   }
 }
 </script>

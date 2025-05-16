@@ -1,3 +1,4 @@
+ /* 1920 x 587 */
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -25,7 +26,8 @@
   font-size: 1.2rem;
   color: white;
   background-color: #1a2b3c; /* ou algo consistente com seu tema */
-  width: 100%;
+  height: 8.31vh;
+  width: 100vw;
 }
 .containers {
   display: grid;
@@ -146,8 +148,8 @@ h4 {
 
 .bulk-button {
   display: flex;
-  width: 35px;
   justify-content: center;
+  font-size: 2vh;
   align-items: center;
 }
 
@@ -218,35 +220,37 @@ h4 {
 
 .card.sellchart {
   margin-top: 10px;
-  width: 269px;
-  height: 114px;
+  width: 21.01vw;
+  height: 19.42vh;
   padding: 0;
 }
 
 .card.automation {
   grid-column: 2;
   grid-row: 1;
-  width: 290px; /* Halved from 500px */
-  height: 133px;
+  width: 265px; /* Halved from 500px */
+  height: 153px;
   margin-left: 10px;
   text-align: justify;
   padding: 10px; /* Reduced padding */
   line-height: 1;
   display: flex;
   flex-direction: column;
+  z-index: 10;
 }
 
 .card.refinery {
   grid-column: 2;
   grid-row: 1;
-  width: 290px; /* Same width as automation */
-  height: 133px;
-  margin-left: 265px; /* Position to the right of automation */
+  width: 305px; /* Same width as automation */
+  height: 153px;
+  margin-left: 270px; /* Position to the right of automation */
   text-align: justify;
   padding: 10px;
   line-height: 1;
   display: flex;
   flex-direction: column;
+  z-index: 5;
 }
 
 .autoinfo {
@@ -290,15 +294,15 @@ h4 {
 }
 
 .card.business {
-  grid-column: 1; /* Fica na primeira coluna */
+  grid-column: 1;
   grid-row: 1;
-  font-size: 14px; /* Fica na primeira linha */
-  width: 250px;
-  height: 375px;
   top: 0;
   left: 0;
+  height: 67.46vh;
+  width: 21.09vw;
   justify-content: space-between;
-  padding: 10px; /* Espaço interno para afastar a borda do texto */
+  padding: 0 20px;
+  font-size: 12px;
 }
 
 .sellprice {
@@ -315,8 +319,8 @@ h4 {
 .card.terminal {
   grid-column: 3; /* Fica na primeira coluna */
   grid-row: 1; /* Fica na primeira linha */
-  width: 385px;
-  height: 150px;
+  width: 405px;
+  height: 170px;
   margin-left: 10px;
   top: 0px;
   right: 0px;
@@ -374,6 +378,7 @@ body {
   overflow-y: auto;
   min-width: 320px;
   min-height: 100vh;
+  font-family: 'Courier New', Courier, monospace;
 }
 h1 {
   font-size: 3.2em;

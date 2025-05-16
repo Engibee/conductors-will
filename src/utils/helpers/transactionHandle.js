@@ -1,5 +1,5 @@
-import { gameState, stakeHoldingTrading } from "../../composables/gameState.js";
 import { useGameStore } from "../../stores/gameStore.js";
+import { useStakeHoldingTradingStore } from "../../stores/stakeTrading.js";
 
 export function canAfford(price) {
   const game = useGameStore();
@@ -17,6 +17,8 @@ export function spend(price) {
 }
 
 export function resetStakeOffers() {
+  const stakeHoldingTrading = useStakeHoldingTradingStore();
+
   stakeHoldingTrading.fundsOffer = 0;
   stakeHoldingTrading.copperWireinMeterOffer = 0;
   stakeHoldingTrading.rentedBuildingOffer = 0;

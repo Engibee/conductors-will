@@ -25,7 +25,7 @@
 <script setup>
 import worldMap from "../assets/world-map.svg?raw";
 import { onMounted } from "vue";
-import { useContinentRealEstateStore } from "../stores/realEstateStore.js";
+import { useContinentRealEstateStore, useSelectedContinentStore } from "../stores/realEstateStore.js";
 
 const worldMapUrl = worldMap;
 
@@ -37,7 +37,7 @@ onMounted(() => {
 
 const handleClick = (event) => {
   let clickedElement = event.target;
-  const realEstate = useContinentRealEstateStore();
+  const selectedContinentStore = useSelectedContinentStore();
 
   if (clickedElement.tagName === "path") {
     // Checamos se o elemento pai tem um ID (ou seja, é um grupo de continente)
@@ -45,8 +45,8 @@ const handleClick = (event) => {
 
     if (group) {
       // Define o continente selecionado
-      realEstate.selectedContinent.name = group.id;
-      console.log(realEstate.selectedContinent.name);
+      selectedContinentStore.name = group.id;
+      console.log(selectedContinentStore.name);
 
       // Resetando cor de todos os grupos (opcional)
       document.querySelectorAll("svg g[id]").forEach((g) => {

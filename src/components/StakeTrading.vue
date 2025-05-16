@@ -1,5 +1,5 @@
 <template>
-  <div v-if="gameState.isStakeModalOpen" class="modal-overlay">
+  <div v-if="game.isStakeModalOpen" class="modal-overlay">
     <div class="modal-content">
       <div class="offerTable">
         <div class="funds">
@@ -7,12 +7,12 @@
             Funds:
             <input
               type="number"
-              v-model.number="stakeHoldingTrading.fundsOffer"
-              :max="gameState.funds"
+              v-model.number="stakeHoldingTradingStore.fundsOffer"
+              :max="game.funds"
               min="0"
               @change="validateOffer('funds')"
             />
-            max: ${{ gameState.funds.toLocaleString() }}
+            max: ${{ game.funds.toLocaleString() }}
           </p>
         </div>
         <div class="copperWire">
@@ -20,12 +20,12 @@
             Copper Wire:
             <input
               type="number"
-              v-model.number="stakeHoldingTrading.copperWireinMeterOffer"
-              :max="gameState.copperWireinMeter"
+              v-model.number="stakeHoldingTradingStore.copperWireinMeterOffer"
+              :max="game.copperWireinMeter"
               min="0"
               @change="validateOffer('copperWireinMeter')"
             />
-            max: {{ gameState.copperWireinMeter.toLocaleString() }}m
+            max: {{ game.copperWireinMeter.toLocaleString() }}m
           </p>
         </div>
         <div class="residential">
@@ -33,12 +33,12 @@
             Residential:
             <input
               type="number"
-              v-model.number="stakeHoldingTrading.rentedBuildingOffer"
-              :max="continentRealEstate[selectedContinent.name].rentedBuildings"
+              v-model.number="stakeHoldingTradingStore.rentedBuildingOffer"
+              :max="continentRealEstateStore[selectedContinentStore.name].rentedBuildings"
               min="0"
               @change="validateOffer('residential')"
             />
-            max: {{ continentRealEstate[selectedContinent.name].rentedBuildings }}
+            max: {{ continentRealEstateStore[selectedContinentStore.name].rentedBuildings }}
           </p>
         </div>
         <div class="factory">
@@ -46,28 +46,28 @@
             Factories:
             <input
               type="number"
-              v-model.number="stakeHoldingTrading.factoriesOffer"
-              :max="continentRealEstate[selectedContinent.name].factories"
+              v-model.number="stakeHoldingTradingStore.factoriesOffer"
+              :max="continentRealEstateStore[selectedContinentStore.name].factories"
               min="0"
               @change="validateOffer('factories')"
             />
-            max: {{ continentRealEstate[selectedContinent.name].factories }}
+            max: {{ continentRealEstateStore[selectedContinentStore.name].factories }}
           </p>
         </div>
       </div>
       <div class="answer">
         <p>You're dealing with:</p>
-        <h2>{{ stakeHoldingTrading.selectedOrganization }}</h2>
+        <h2>{{ stakeHoldingTradingStore.selectedOrganization }}</h2>
         <p>
           Their stake:
           {{
-            stakeHoldingTrading[
-              stakeHoldingTrading.selectedOrganization.replace(" ", "")
+            stakeHoldingTradingStore[
+              stakeHoldingTradingStore.selectedOrganization.replace(" ", "")
             ].stake
           }}% -({{ calculateStakeOffer() }}%)
         </p>
         <p>
-          Your stake: {{ stakeHoldingTrading.You }}% +({{
+          Your stake: {{ stakeHoldingTradingStore.You }}% +({{
             calculateStakeOffer()
           }}%)
         </p>
@@ -82,34 +82,33 @@
 
 <script setup>
 import { resetStakeOffers } from "../utils/helpers/transactionHandle";
-import {
-  gameState,
-  stakeHoldingTrading,
-  resourcesValue,
-  totalAvailableBuildings,
-  totalFactories,
-  totalRentedBuildings,
-  continentRealEstate,
-  selectedContinent,
-} from "../composables/gameState";
+import { useStakeHoldingTradingStore, useResourcesStore } from "../stores/stakeTrading";
+import { useContinentRealEstateStore, useSelectedContinentStore } from "../stores/realEstateStore";
+import { useGameStore } from "../stores/gameStore";
+
+const game = useGameStore();
+const stakeHoldingTradingStore = useStakeHoldingTradingStore();
+const resourcesStore = useResourcesStore();
+const continentRealEstateStore = useContinentRealEstateStore();
+const selectedContinentStore = useSelectedContinentStore();
 
 function calculateStakeOffer() {
-  const org = stakeHoldingTrading.selectedOrganization.replace(" ", "");
-  const orgData = stakeHoldingTrading[org];
+  const org = stakeHoldingTradingStore.selectedOrganization.replace(" ", "");
+  const orgData = stakeHoldingTradingStore[org];
   if (!orgData || !orgData.valuationWeight) return 0;
 
   const weights = orgData.valuationWeight;
 
   const offerScore =
-    stakeHoldingTrading.fundsOffer * resourcesValue.funds * weights.funds +
-    stakeHoldingTrading.copperWireinMeterOffer *
-      resourcesValue.copperWireinMeter *
+    stakeHoldingTradingStore.fundsOffer * resourcesStore.funds * weights.funds +
+    stakeHoldingTradingStore.copperWireinMeterOffer *
+      resourcesStore.copperWireinMeter *
       weights.copper +
-    stakeHoldingTrading.rentedBuildingOffer *
-      resourcesValue.rentedBuilding *
+    stakeHoldingTradingStore.rentedBuildingOffer *
+      resourcesStore.rentedBuilding *
       weights.residential +
-    stakeHoldingTrading.factoriesOffer *
-      resourcesValue.factories *
+    stakeHoldingTradingStore.factoriesOffer *
+      resourcesStore.factories *
       weights.factories;
 
   const stakeAlreadyOwned = orgData.stake;
@@ -122,34 +121,34 @@ function calculateStakeOffer() {
 
 function validateOffer(commodity) {
   const offerKey = `${commodity}Offer`;
-  const max = gameState[commodity];
+  const max = game[commodity];
 
-  if (stakeHoldingTrading[offerKey] > max) {
-    stakeHoldingTrading[offerKey] = max;
-  } else if (stakeHoldingTrading[offerKey] < 0) {
-    stakeHoldingTrading[offerKey] = 0;
+  if (stakeHoldingTradingStore[offerKey] > max) {
+    stakeHoldingTradingStore[offerKey] = max;
+  } else if (stakeHoldingTradingStore[offerKey] < 0) {
+    stakeHoldingTradingStore[offerKey] = 0;
   }
 }
 
 const tabClose = () => {
-  gameState.isPaused = false;
-  gameState.isStakeModalOpen = false;
-  gameState.selectedOrganization = null;
+  game.isPaused = false;
+  game.isStakeModalOpen = false;
+  game.selectedOrganization = null;
   resetStakeOffers();
 };
 
 const confirmStake = () => {
-  const org = stakeHoldingTrading.selectedOrganization.replace(" ", "");
-  const orgData = stakeHoldingTrading[org];
+  const org = stakeHoldingTradingStore.selectedOrganization.replace(" ", "");
+  const orgData = stakeHoldingTradingStore[org];
   const offerScore = calculateStakeOffer();
 
-  stakeHoldingTrading.You += offerScore;
+  stakeHoldingTradingStore.You += offerScore;
   orgData.stake -= offerScore;
 
-  gameState.funds -= stakeHoldingTrading.fundsOffer;
-  gameState.copperWireinMeter -= stakeHoldingTrading.copperWireinMeterOffer;
-  continentRealEstate[selectedContinent.name].rentedBuildings -= stakeHoldingTrading.rentedBuildingOffer;
-  continentRealEstate[selectedContinent.name].factories -= stakeHoldingTrading.factoriesOffer;
+  game.funds -= stakeHoldingTradingStore.fundsOffer;
+  game.copperWireinMeter -= stakeHoldingTradingStore.copperWireinMeterOffer;
+  continentRealEstateStore[selectedContinentStore.name].rentedBuildings -= stakeHoldingTradingStore.rentedBuildingOffer;
+  continentRealEstateStore[selectedContinentStore.name].factories -= stakeHoldingTradingStore.factoriesOffer;
 
   tabClose();
 };

@@ -1,7 +1,7 @@
 <script setup>
 import { usePaperclipGame } from "./composables/usePaperclipGame.js";
 import { useGameStore } from "./stores/gameStore.js";
-import { useContinentRealEstateStore } from "./stores/realEstateStore.js";
+import { useContinentRealEstateStore, useSelectedContinentStore } from "./stores/realEstateStore.js";
 import { useChartStore } from "./stores/chartStore.js";
 import { usePerkStore } from "./stores/perkStore.js";
 import PerkCard from "./components/PerkCards.vue";
@@ -26,6 +26,7 @@ const {
   currentDemand,
   makeCopperWire,
   buy_worker,
+  assignRefinery,
   buy_refined_copper,
   buy_marketing,
   increasePrice,
@@ -36,6 +37,7 @@ const {
 
 const game = useGameStore();
 const realEstate = useContinentRealEstateStore();
+const selectedContinent = useSelectedContinentStore();
 const chart = useChartStore();
 const perks = usePerkStore();
 </script>
@@ -77,7 +79,7 @@ const perks = usePerkStore();
         >
           -
         </button>
-        <button @click="buy_refined_copper">
+        <button class="bulk-button" @click="buy_refined_copper">
           Buy Ref. Copper x {{ game.copperBulkAmount }}
         </button>
         <button
@@ -99,12 +101,12 @@ const perks = usePerkStore();
         <h3>Wire Production</h3>
         <div class="autoinfo">
           <div class="button-group">
-            <button @click="buy_worker">Hire</button>
-            <p>Workers: {{ game.workers }}</p>
+            <button @click="buy_worker">Assign</button>
+            <p>Workers: {{ game.wirers }}</p>
           </div>
           <p>Price: ${{ formatPrice(game.workersPrice) }}</p>
-          <p>Total: {{ game.workers + realEstate.totalFactories * 100 }} (+{{
-            realEstate.totalFactories * 100
+          <p>Total: {{ game.wirers + realEstate.totalFactories * 50 }} (+{{
+            realEstate.totalFactories * 50
           }} in factories)</p>
         </div>
         <p class="mini_info">Makes 1m wire per worker per tick</p>
@@ -115,7 +117,7 @@ const perks = usePerkStore();
       <div class="refinery-info">
         <div class="button-group">
           <button @click="assignRefinery">Assign</button>
-          <p>Refiners: {{ game.refiners || 0 }}</p>
+          <p>Refiners: {{ game.refiners || 0 }} (+ {{ realEstate.totalFactories }} in factories)</p>
         </div>
         <p>Ore: {{ (game.availableCopperOre).toFixed(3) }}</p>
         <p>Refined: {{ formatPrice(game.availableCopper) }} kg</p>
@@ -217,13 +219,13 @@ const perks = usePerkStore();
     </div>
     <div v-if="perks.hasRealEstate" class="world-map-info">
       <div
-        v-if="realEstate.selectedContinent.name != 'No continent selected'"
+        v-if="selectedContinent.name != 'No continent selected'"
         class="real-estate"
       >
         <RealEstate />
       </div>
       <div
-        v-if="realEstate.selectedContinent.name != 'No continent selected'"
+        v-if="selectedContinent.name != 'No continent selected'"
         class="stakeholding"
       >
         <Stakeholding />

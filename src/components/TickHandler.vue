@@ -1,7 +1,6 @@
 <!-- components/TickHandler.vue -->
 <script setup>
 import { onMounted, onUnmounted } from 'vue'
-import { gameState } from '../composables/gameState.js'
 import { useGameStore } from '../stores/gameStore.js'
 
 let interval = null
