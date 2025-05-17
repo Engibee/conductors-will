@@ -15,8 +15,7 @@
 
 .world-map {
   width: 100%;
-  height: auto;
-  max-height: 100%;
+  height: 100%;
   object-fit: contain;
   pointer-events: none;
 }

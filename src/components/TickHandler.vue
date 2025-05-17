@@ -11,7 +11,7 @@ onMounted(() => {
   console.log('✅ Tick handler montado')
   
   const handleTick = (timestamp) => {
-    if (!document.hidden && !game.isPaused) {
+    if (!game.isPaused) {
       // Calculate delta time to handle varying frame rates
       const deltaTime = timestamp - lastTime;
       if (deltaTime >= 1000) { // Ensure 1 second has passed

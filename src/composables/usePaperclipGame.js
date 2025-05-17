@@ -252,7 +252,7 @@ export function usePaperclipGame() {
   function assignRefinery() {
     // If we have available wirers, assign one to refinery
     if (game.wirers > 100) {
-      game.wirers +- 100;
+      game.wirers -= 100;
       game.refiners += 1;
     }
     else{

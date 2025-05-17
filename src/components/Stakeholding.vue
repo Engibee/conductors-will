@@ -170,10 +170,8 @@ function onChartClick(event) {
 
 <style scoped>
 .chart-wrapper {
-  width: 114px;
-  height: 120px;
-  left: 0px;
-  margin: auto;
+  width: 8.90vw;
+  height: 20.44vh;
 }
 
 canvas {
@@ -194,15 +192,15 @@ canvas {
   background-color: white;
   border: none;
   border-radius: 8px;
-  padding: 8px;
-  margin-right: 5px;
+  padding: 1.36vh 0.625vw;
+  margin-right: 0.39vw;
   cursor: pointer;
 }
 
 .button-row {
   display: flex;
   flex-direction: column;
-  justify-content: center; /* <-- alinha verticalmente */
-  align-items: center; /* <-- centraliza na horizontal */ /* ou a altura que você quiser */
+  justify-content: center;
+  align-items: center;
 }
 </style>
