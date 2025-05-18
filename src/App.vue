@@ -1,24 +1,27 @@
 <script setup>
 import { usePaperclipGame } from "./composables/usePaperclipGame.js";
 import { useGameStore } from "./stores/gameStore.js";
-import { useContinentRealEstateStore, useSelectedContinentStore } from "./stores/realEstateStore.js";
+import {
+  useContinentRealEstateStore,
+  useSelectedContinentStore,
+} from "./stores/realEstateStore.js";
 import { useChartStore } from "./stores/chartStore.js";
 import { usePerkStore } from "./stores/perkStore.js";
 import PerkCard from "./components/PerkCards.vue";
 import TickHandler from "./components/TickHandler.vue";
 import WorldMap from "./components/WorldMap.vue";
 import GameChart from "./components/SellChart.vue";
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent } from "vue";
 import { formatPrice, formatDate } from "./utils/helpers/format.js";
 
 // Components that can be lazy-loaded
-const RealEstate = defineAsyncComponent(() => 
+const RealEstate = defineAsyncComponent(() =>
   import("./components/RealEstate.vue")
 );
-const Stakeholding = defineAsyncComponent(() => 
+const Stakeholding = defineAsyncComponent(() =>
   import("./components/Stakeholding.vue")
 );
-const StakeTrading = defineAsyncComponent(() => 
+const StakeTrading = defineAsyncComponent(() =>
   import("./components/StakeTrading.vue")
 );
 
@@ -91,9 +94,7 @@ const perks = usePerkStore();
         </button>
       </div>
       <p class="mini_info">
-        Price: ${{
-          formatPrice(game.kgOfCopper * game.copperBulkAmount)
-        }}
+        Price: ${{ formatPrice(game.kgOfCopper * game.copperBulkAmount) }}
       </p>
     </div>
     <transition name="fade-slide">
@@ -105,9 +106,12 @@ const perks = usePerkStore();
             <p>Workers: {{ game.wirers }}</p>
           </div>
           <p>Price: ${{ formatPrice(game.workersPrice) }}</p>
-          <p>Total: {{ game.wirers + realEstate.totalFactories * 50 }} (+{{
-            realEstate.totalFactories * 50
-          }} in factories)</p>
+          <p>
+            Total: {{ game.wirers + realEstate.totalFactories * 50 }} (+{{
+              realEstate.totalFactories * 50
+            }}
+            in factories)
+          </p>
         </div>
         <p class="mini_info">Makes 1m wire per worker per tick</p>
       </div>
@@ -117,24 +121,23 @@ const perks = usePerkStore();
       <div class="refinery-info">
         <div class="button-group">
           <button @click="assignRefinery">Assign</button>
-          <p>Refiners: {{ game.refiners || 0 }} (+ {{ realEstate.totalFactories }} in factories)</p>
+          <p>
+            Refiners: {{ game.refiners || 0 }} (+
+            {{ realEstate.totalFactories }} in factories)
+          </p>
         </div>
-        <p>Ore: {{ (game.availableCopperOre).toFixed(3) }}</p>
+        <p>Ore: {{ game.availableCopperOre.toFixed(3) }}</p>
         <p>Refined: {{ formatPrice(game.availableCopper) }} kg</p>
       </div>
       <p class="mini_info">Refines 100 ore to 1kg copper per worker</p>
     </div>
     <div class="card terminal">
       <div class="time">
-        📅 Week: {{ game.week }} | 📆 Month:
-        {{ formatDate(game.month) }} | 📅 Year:
+        📅 Week: {{ game.week }} | 📆 Month: {{ formatDate(game.month) }} | 📅
+        Year:
         {{ game.year }}
       </div>
-      <div
-        v-for="(msg, index) in game.logs"
-        :key="index"
-        class="log-message"
-      >
+      <div v-for="(msg, index) in game.logs" :key="index" class="log-message">
         {{ msg }}
       </div>
     </div>
@@ -159,7 +162,13 @@ const perks = usePerkStore();
         <div class="marketing-info">
           <p>Marketing: {{ game.marketing }}%</p>
           <button @click="buy_marketing">Buy</button>
-          <p>Price: ${{ formatPrice(game.marketingPrice) }}</p>
+          <p>
+            {{
+              game.marketing >= 100
+                ? "The entire world knows about the conductor's will!!!"
+                : `Price: $${formatPrice(game.marketingPrice)}`
+            }}
+          </p>
         </div>
       </div>
       <div class="perks-container">
@@ -180,9 +189,7 @@ const perks = usePerkStore();
           />
           <PerkCard
             v-if="
-              perks.hasMachinery &&
-              perks.hasRealEstate &&
-              !perks.hasRefinery
+              perks.hasMachinery && perks.hasRealEstate && !perks.hasRefinery
             "
             perk-id="refinery"
             title="Build a refinery"
@@ -192,10 +199,7 @@ const perks = usePerkStore();
         </div>
         <div class="commodity-perks">
           <PerkCard
-            v-if="
-              !perks.hasContractProvider &&
-              game.lifeTimeCopperWire >= 0
-            "
+            v-if="!perks.hasContractProvider && game.lifeTimeCopperWire >= 0"
             perk-id="contract-provider"
             title="Contract with a provider"
             description="Buy commodity in bulks. (max. 10)"

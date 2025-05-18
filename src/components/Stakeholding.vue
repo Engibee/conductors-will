@@ -191,7 +191,7 @@ canvas {
   align-items: center;
   background-color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 1.5%;
   padding: 1.36vh 0.625vw;
   margin-right: 0.39vw;
   cursor: pointer;

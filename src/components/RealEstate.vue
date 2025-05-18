@@ -5,38 +5,50 @@
       selectedContinent.name != 'No continent selected'
     "
   >
-    <p class="real-state-info">
+    <p class="real-estate-info">
       🏭Factories: {{ realEstate[selectedContinent.name].factories }}
-      <button @click="increaseFactory" class="real-state-info-btn">
+      <button @click="increaseFactory" class="real-estate-info-btn">
         Factorize
       </button>
     </p>
-    <p class="real-state-info">
+    <p class="real-estate-info">
       🏚️Available Buildings:
       {{ realEstate[selectedContinent.name].availableBuildings }}
-      <button @click="buyRealEstate" class="real-state-info-btn">
+      <button @click="buyRealEstate" class="real-estate-info-btn">
         Buy: $10,000
       </button>
     </p>
-    <p class="real-state-info">
+    <p class="real-estate-info">
       🏘️Rented Buildings:
       {{ realEstate[selectedContinent.name].rentedBuildings }}
-      <button @click="increaseRentedBulding" class="real-state-info-btn">
+      <button @click="increaseRentedBulding" class="real-estate-info-btn">
         Rent
       </button>
     </p>
   </div>
 
   <div class="license-container" v-else>
-    <button class="buy-license-btn" @click="buyLicense">
+    <button
+      class="buy-license-btn"
+      @mouseenter="hover = true"
+      @mouseleave="hover = false"
+      @click="buyLicense"
+      :style="{ backgroundColor: hover ? '#405466' : 'transparent' }"
+    >
       Unlock real estate in {{ selectedContinent.name }} – $50,000
     </button>
   </div>
 </template>
 
 <script setup>
-import { useContinentRealEstateStore, useSelectedContinentStore } from "../stores/realEstateStore.js";
+import {
+  useContinentRealEstateStore,
+  useSelectedContinentStore,
+} from "../stores/realEstateStore.js";
 import { spend } from "../utils/helpers/transactionHandle.js";
+import { ref } from 'vue';
+
+const hover = ref(false);
 
 const realEstate = useContinentRealEstateStore();
 const selectedContinent = useSelectedContinentStore();
@@ -47,6 +59,7 @@ function buyLicense() {
   } else {
     alert("Not enough funds to buy this license.");
   }
+  hover.value = false;
 }
 
 function buyRealEstate() {
@@ -77,16 +90,16 @@ function increaseRentedBulding() {
 </script>
 
 <style scoped>
-.real-state-info {
+.real-estate-info {
   display: flex;
   flex-direction: column;
   align-items: center;
   font-size: 0.8rem;
-  margin: 3px 0;
-  padding: 0px;
+  margin: 0.2vh 0;
+  padding: 1%;
 }
 
-.real-state-info-btn {
+.real-estate-info-btn {
   padding: 0px;
   font-size: 0.7rem;
   line-height: 1;
@@ -99,10 +112,12 @@ function increaseRentedBulding() {
 .buy-license-btn {
   width: 100%;
   height: 100%;
-  font-size: 1.2rem;
+  font-size: 1rem;
+  color: white;
+  background-color: transparent;
   padding: 1rem;
   border: none;
-  border-radius: 10px;
+  border-radius: 2%;
   cursor: pointer;
 }
 </style>

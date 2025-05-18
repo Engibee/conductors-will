@@ -191,7 +191,7 @@ const cancelStake = () => {
   flex-wrap: wrap;
   background-color: #213547;
   padding: 20px;
-  border-radius: 12px;
+  border-radius: 2%;
   width: 400px;
   color: white;
   text-align: center;

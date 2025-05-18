@@ -154,10 +154,14 @@ export function usePaperclipGame() {
       : alert("Not enough funds to hire more wirers.");
   }
   function buy_marketing() {
-    transaction.spend(game.marketingPrice)
-      ? game.marketing++
-      : alert("Not enough funds to invest in marketing.");
-    game.marketingPrice = getMarketingPrice(game.marketing);
+    if (game.marketing >= 100) {
+      game.marketing = 100;
+    } else {
+      transaction.spend(game.marketingPrice)
+        ? game.marketing++
+        : alert("Not enough funds to invest in marketing.");
+      game.marketingPrice = getMarketingPrice(game.marketing);
+    }
   }
   function getMarketingPrice(marketingLevel) {
     return Math.floor(10 * Math.pow(marketingLevel, 3));
@@ -254,17 +258,20 @@ export function usePaperclipGame() {
     if (game.wirers > 100) {
       game.wirers -= 100;
       game.refiners += 1;
-    }
-    else{
+    } else {
       alert("You need 100 wirers to turn into a refiner.");
     }
   }
 
   // Update the refinery logic in your tick handler
   function refinery_handler() {
-    if (game.availableCopperOre >= (game.refiners + realEstate.totalFactories) * 100) {
+    if (
+      game.availableCopperOre >=
+      (game.refiners + realEstate.totalFactories) * 100
+    ) {
       game.availableCopper += (game.refiners + realEstate.totalFactories) * 100;
-      game.availableCopperOre -= (game.refiners + realEstate.totalFactories) * 100;
+      game.availableCopperOre -=
+        (game.refiners + realEstate.totalFactories) * 100;
     }
   }
   return {
