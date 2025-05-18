@@ -226,6 +226,7 @@ h4 {
 .card.automation {
   grid-column: 2;
   grid-row: 1;
+  border-radius: 0%;
   width: 20.70vw; /* Halved from 500px */
   height: 29.06vh;
   margin-left: 0.78vw;
@@ -239,9 +240,10 @@ h4 {
 .card.refinery {
   grid-column: 2;
   grid-row: 1;
+  border-radius: 0%;
   width: 23.82vw;
   height: 29.06vh;
-  margin-left: 21.09vw;
+  margin-left: 21.01vw;
   text-align: justify;
   padding: 1.703vh 0.781vw;
   display: flex;

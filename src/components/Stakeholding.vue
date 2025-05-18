@@ -189,6 +189,7 @@ canvas {
   display: flex;
   flex-direction: column;
   align-items: center;
+  color: black;
   background-color: white;
   border: none;
   border-radius: 1.5%;
