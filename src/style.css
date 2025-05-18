@@ -139,7 +139,6 @@ h4 {
   align-items: center;
   justify-content: center;
   color: white;
-  overflow: hidden;
 }
 
 .bulk-button {
@@ -193,7 +192,6 @@ h4 {
   border: 2px solid #fff;
   background-color: #222;
   border-radius: 1%;
-  overflow: hidden;
   position: relative;
   margin-left: 0.78vw;
 }
@@ -227,7 +225,7 @@ h4 {
   grid-column: 2;
   grid-row: 1;
   border-radius: 0%;
-  width: 20.70vw; /* Halved from 500px */
+  width: 22vw; /* Halved from 500px */
   height: 29.06vh;
   margin-left: 0.78vw;
   text-align: justify;
@@ -238,17 +236,24 @@ h4 {
 }
 
 .card.refinery {
+  background-color: #684177;
   grid-column: 2;
   grid-row: 1;
   border-radius: 0%;
-  width: 23.82vw;
+  border: 0;
+  width: 22.26vw;
   height: 29.06vh;
-  margin-left: 21.01vw;
+  margin-left: 0.78vw; /*22.61vw;*/
   text-align: justify;
-  padding: 1.703vh 0.781vw;
   display: flex;
   flex-direction: column;
   z-index: 5;
+}
+
+.card.refinery.refinery-moved {
+  transform: translateX(21.05vw);
+  transition: transform 0.4s ease-in-out;
+  padding: 1.703vh 0.781vw;
 }
 
 .autoinfo {

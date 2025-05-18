@@ -43,16 +43,19 @@ const realEstate = useContinentRealEstateStore();
 const selectedContinent = useSelectedContinentStore();
 const chart = useChartStore();
 const perks = usePerkStore();
-const logContainer = ref(null)
+const logContainer = ref(null);
 
-watch(() => game.logs.length, () => {
-  nextTick(() => {
-    const el = logContainer.value
-    if (el) {
-      el.scrollTop = el.scrollHeight
-    }
-  })
-})
+watch(
+  () => game.logs.length,
+  () => {
+    nextTick(() => {
+      const el = logContainer.value;
+      if (el) {
+        el.scrollTop = el.scrollHeight;
+      }
+    });
+  }
+);
 </script>
 
 <template>
@@ -127,20 +130,22 @@ watch(() => game.logs.length, () => {
         <p class="mini_info">Makes 1m wire per worker per tick</p>
       </div>
     </transition>
-    <div v-if="perks.hasRefinery" class="card refinery">
-      <h3>Copper Refinery</h3>
-      <div class="refinery-info">
-        <div class="button-group">
-          <button @click="assignRefinery">Assign</button>
-          <p>
-            Refiners: {{ game.refiners || 0 }} (+
-            {{ realEstate.totalFactories }} in factories)
-          </p>
+    <div class="card refinery">
+      <div class="card refinery" :class="{ 'refinery-moved': perks.hasRefinery }">
+        <h3>Copper Refinery</h3>
+        <div class="refinery-info">
+          <div class="button-group">
+            <button @click="assignRefinery">Assign</button>
+            <p>
+              Refiners: {{ game.refiners || 0 }} (+
+              {{ realEstate.totalFactories }} in factories)
+            </p>
+          </div>
+          <p>Ore: {{ game.availableCopperOre.toFixed(3) }}</p>
+          <p>Refined: {{ formatPrice(game.availableCopper) }} kg</p>
         </div>
-        <p>Ore: {{ game.availableCopperOre.toFixed(3) }}</p>
-        <p>Refined: {{ formatPrice(game.availableCopper) }} kg</p>
+        <p class="mini_info">Refines 100 ore to 1kg copper per worker</p>
       </div>
-      <p class="mini_info">Refines 100 ore to 1kg copper per worker</p>
     </div>
     <div ref="logContainer" class="card terminal">
       <div class="time">
