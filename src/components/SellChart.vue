@@ -25,7 +25,7 @@ onMounted(() => {
         labels: [],
         datasets: [
           {
-            label: "Vendas por mês",
+            label: "Monthly sales",
             data: [],
             borderColor: "white",
             backgroundColor: "lightblue",

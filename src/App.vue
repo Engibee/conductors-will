@@ -193,7 +193,7 @@ const perks = usePerkStore();
             "
             perk-id="refinery"
             title="Build a refinery"
-            description="Allows a passive production of refined copper using ore."
+            description="Allows ore refining."
             :price="20000.0"
           />
         </div>

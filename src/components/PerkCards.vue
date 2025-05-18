@@ -1,11 +1,11 @@
 <template>
   <div class="perk-box">
-    <p>
+    <p style="font-size: 0.8vw; margin-bottom: 0.3vh;">
       <strong>{{ title }}</strong
       ><br />{{ description }}
     </p>
-    <p>Price: ${{ price }}</p>
-    <button @click="buy()">Buy</button>
+    <p style="margin-bottom: 0.3vh;">Price: ${{ price }}</p>
+    <button @click="buy" style="font-size: 0.8vw;">Buy</button>
   </div>
 </template>
 
@@ -27,6 +27,7 @@ function buy() {
 
 <style scoped>
 .perk-box {
-  margin: 10px 0;
+  display:block;
+  font-size: 0.5vw;
 }
 </style>
