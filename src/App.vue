@@ -70,7 +70,8 @@ watch(() => game.logs.length, () => {
   </div>
   <div class="containers">
     <div class="card business">
-      <h3>Stock: {{ game.copperWireinMeter }} meters</h3>
+      <h3>Stock:</h3>
+      <h2>{{ game.copperWireinMeter.toLocaleString() }}m</h2>
       <button @click="makeCopperWire">Make Copper Wire</button>
 
       <h5>Business</h5>

@@ -33,7 +33,7 @@
       @mouseenter="hover = true"
       @mouseleave="hover = false"
       @click="buyLicense"
-      :style="{ backgroundColor: hover ? '#405466' : 'transparent' }"
+      :style="{ backgroundColor: hover ? '#405466' : 'transparent'}"
     >
       Unlock real estate in {{ selectedContinent.name }} – $50,000
     </button>
@@ -94,6 +94,7 @@ function increaseRentedBulding() {
   display: flex;
   flex-direction: column;
   align-items: center;
+  color: white;
   font-size: 0.8rem;
   margin: 0.2vh 0;
 }
@@ -104,18 +105,21 @@ function increaseRentedBulding() {
   line-height: 1;
   width: 12vw;
   border-radius: 0px;
+  color: black;
   background-color: white;
   cursor: pointer;
 }
 
 .buy-license-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
   height: 100%;
   font-size: 1rem;
   color: white;
   background-color: transparent;
   padding: 1rem;
-  border: none;
   border-radius: 2%;
   cursor: pointer;
 }
