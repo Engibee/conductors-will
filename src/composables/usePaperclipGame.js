@@ -252,15 +252,8 @@ export function usePaperclipGame() {
       game.priceOfCopper = Math.max(0, game.priceOfCopper);
     }
   }
-  // Add this function to handle refinery wirers
   function assignRefinery() {
-    // If we have available wirers, assign one to refinery
-    if (game.wirers > 100) {
-      game.wirers -= 100;
-      game.refiners += 1;
-    } else {
-      alert("You need 100 wirers to turn into a refiner.");
-    }
+    transaction.spend(3500) ? game.refiners++ : alert("Not enough funds to hire a refiner.");
   }
 
   // Update the refinery logic in your tick handler

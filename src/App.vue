@@ -11,7 +11,7 @@ import PerkCard from "./components/PerkCards.vue";
 import TickHandler from "./components/TickHandler.vue";
 import WorldMap from "./components/WorldMap.vue";
 import GameChart from "./components/SellChart.vue";
-import { defineAsyncComponent, ref, watch } from "vue";
+import { defineAsyncComponent, ref, watch, nextTick } from "vue";
 import { formatPrice, formatDate } from "./utils/helpers/format.js";
 
 // Components that can be lazy-loaded
@@ -116,33 +116,28 @@ watch(
         <h3>Wire Production</h3>
         <div class="autoinfo">
           <div class="button-group">
-            <button @click="buy_worker">Assign</button>
-            <p>Workers: {{ game.wirers }}</p>
+            <button @click="buy_worker">Hire</button>
+            <p>Wirers: {{ game.wirers || 0}} (+
+              {{ realEstate.totalFactories * 50}} in factories)</p>
           </div>
           <p>Price: ${{ formatPrice(game.workersPrice) }}</p>
-          <p>
-            Total: {{ game.wirers + realEstate.totalFactories * 50 }} (+{{
-              realEstate.totalFactories * 50
-            }}
-            in factories)
-          </p>
         </div>
         <p class="mini_info">Makes 1m wire per worker per tick</p>
       </div>
     </transition>
-    <div class="card refinery">
+    <div class="card refinery" v-if="perks.hasRefinery && perks.hasMachinery">
       <div class="card refinery" :class="{ 'refinery-moved': perks.hasRefinery }">
         <h3>Copper Refinery</h3>
         <div class="refinery-info">
           <div class="button-group">
-            <button @click="assignRefinery">Assign</button>
+            <button @click="assignRefinery">Hire</button>
             <p>
               Refiners: {{ game.refiners || 0 }} (+
               {{ realEstate.totalFactories }} in factories)
             </p>
           </div>
-          <p>Ore: {{ game.availableCopperOre.toFixed(3) }}</p>
-          <p>Refined: {{ formatPrice(game.availableCopper) }} kg</p>
+          <p>Price: $3,500</p>
+          <p>Ore: {{ game.availableCopperOre.toLocaleString() }}</p>
         </div>
         <p class="mini_info">Refines 100 ore to 1kg copper per worker</p>
       </div>
