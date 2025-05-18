@@ -190,9 +190,9 @@ const cancelStake = () => {
   display: flex;
   flex-wrap: wrap;
   background-color: #213547;
-  padding: 20px;
+  padding: 3.40vh 1.56vw;
   border-radius: 2%;
-  width: 400px;
+  width: 31.25vw;
   color: white;
   text-align: center;
 }
@@ -201,7 +201,7 @@ const cancelStake = () => {
   width: 100%;
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
-  margin-top: 16px;
+  gap: 1%;
+  margin-top: 2.72vh;
 }
 </style>

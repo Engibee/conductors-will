@@ -11,7 +11,7 @@ import PerkCard from "./components/PerkCards.vue";
 import TickHandler from "./components/TickHandler.vue";
 import WorldMap from "./components/WorldMap.vue";
 import GameChart from "./components/SellChart.vue";
-import { defineAsyncComponent } from "vue";
+import { defineAsyncComponent, ref, watch } from "vue";
 import { formatPrice, formatDate } from "./utils/helpers/format.js";
 
 // Components that can be lazy-loaded
@@ -43,6 +43,16 @@ const realEstate = useContinentRealEstateStore();
 const selectedContinent = useSelectedContinentStore();
 const chart = useChartStore();
 const perks = usePerkStore();
+const logContainer = ref(null)
+
+watch(() => game.logs.length, () => {
+  nextTick(() => {
+    const el = logContainer.value
+    if (el) {
+      el.scrollTop = el.scrollHeight
+    }
+  })
+})
 </script>
 
 <template>
@@ -131,7 +141,7 @@ const perks = usePerkStore();
       </div>
       <p class="mini_info">Refines 100 ore to 1kg copper per worker</p>
     </div>
-    <div class="card terminal">
+    <div ref="logContainer" class="card terminal">
       <div class="time">
         📅 Week: {{ game.week }} | 📆 Month: {{ formatDate(game.month) }} | 📅
         Year:

@@ -96,15 +96,14 @@ function increaseRentedBulding() {
   align-items: center;
   font-size: 0.8rem;
   margin: 0.2vh 0;
-  padding: 1%;
 }
 
 .real-estate-info-btn {
-  padding: 0px;
-  font-size: 0.7rem;
+  padding: 0.1vh 1vw;
+  font-size: 1.1rem;
   line-height: 1;
+  width: 12vw;
   border-radius: 0px;
-  border: 1px solid #ccc;
   background-color: white;
   cursor: pointer;
 }
