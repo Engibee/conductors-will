@@ -4,7 +4,7 @@ import string from "vite-plugin-string";
 
 export default defineConfig({
   plugins: [vue(), string({ include: "**/*.svg" })],
-  // Add build optimization options
+  base: '/',
   build: {
     minify: 'terser',
     terserOptions: {
