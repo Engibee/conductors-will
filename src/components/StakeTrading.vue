@@ -125,7 +125,6 @@ function validateOffer(commodity) {
   const org = stakeHoldingTradingStore.selectedOrganization.replace(" ", "");
   const orgData = stakeHoldingTradingStore[org];
 
-  // Limitar pelo máximo que o jogador tem
   if (stakeHoldingTradingStore[offerKey] > max) {
     stakeHoldingTradingStore[offerKey] = max;
   } else if (stakeHoldingTradingStore[offerKey] < 0) {
@@ -150,7 +149,6 @@ function reduceOfferToMaxStake() {
   const weights = orgData.valuationWeight;
   const availableStake = orgData.stake;
 
-  // Cálculo total da oferta atual
   const offerScore =
     stakeHoldingTradingStore.fundsOffer * resourcesStore.funds * weights.funds +
     stakeHoldingTradingStore.copperWireinMeterOffer * resourcesStore.copperWireinMeter * weights.copper +
@@ -160,7 +158,6 @@ function reduceOfferToMaxStake() {
   const availabilityFactor = 1 - orgData.stake / 100;
   const rawStake = (offerScore * availabilityFactor) / 1000000;
 
-  // Se a oferta ultrapassa o stake disponível, ajusta proporcionalmente todos os recursos
   if (rawStake > availableStake) {
     const reductionRatio = availableStake / rawStake;
 
@@ -182,7 +179,6 @@ function normalizeStakeDistribution() {
   const error = total - 100;
 
   if (Math.abs(error) > 0.001) {
-    // Subtrai/redistribui erro para a organização com maior stake
     let maxOrg = "Government";
     let maxValue = stakeHoldingTradingStore.Governments.stake;
 

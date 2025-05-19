@@ -51,10 +51,10 @@ export function usePaperclipGame() {
     }
     if (ticks_events(5)) {
       buy_simulation_per_tick();
-      generateOrePerStake();
     }
     if (ticks_events(1)) {
       automation_handler();
+      generateOrePerStake();
       if (perks.hasRefinery) {
         refinery_handler();
       }
@@ -66,13 +66,6 @@ export function usePaperclipGame() {
 
     game.availableCopperOre += oreTransaction;
     game.globalCopperOre -= oreTransaction;
-
-    if (perks.hasRefinery) {
-      if (game.availableCopperOre >= 100) {
-        game.availableCopperOre -= 100;
-        game.availableCopper += 1;
-      }
-    }
   }
 
   function generateInitialStakeholding() {
