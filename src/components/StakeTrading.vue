@@ -122,11 +122,78 @@ function calculateStakeOffer() {
 function validateOffer(commodity) {
   const offerKey = `${commodity}Offer`;
   const max = game[commodity];
+  const org = stakeHoldingTradingStore.selectedOrganization.replace(" ", "");
+  const orgData = stakeHoldingTradingStore[org];
 
+  // Limitar pelo máximo que o jogador tem
   if (stakeHoldingTradingStore[offerKey] > max) {
     stakeHoldingTradingStore[offerKey] = max;
   } else if (stakeHoldingTradingStore[offerKey] < 0) {
     stakeHoldingTradingStore[offerKey] = 0;
+  }
+
+  let offerStake = calculateStakeOffer();
+
+  if (offerStake > orgData.stake) {
+    let safeValue = stakeHoldingTradingStore[offerKey];
+    while (offerStake > orgData.stake && safeValue > 0) {
+      safeValue--;
+      stakeHoldingTradingStore[offerKey] = safeValue;
+      offerStake = calculateStakeOffer();
+    }
+  }
+}
+
+function reduceOfferToMaxStake() {
+  const org = stakeHoldingTradingStore.selectedOrganization.replace(" ", "");
+  const orgData = stakeHoldingTradingStore[org];
+  const weights = orgData.valuationWeight;
+  const availableStake = orgData.stake;
+
+  // Cálculo total da oferta atual
+  const offerScore =
+    stakeHoldingTradingStore.fundsOffer * resourcesStore.funds * weights.funds +
+    stakeHoldingTradingStore.copperWireinMeterOffer * resourcesStore.copperWireinMeter * weights.copper +
+    stakeHoldingTradingStore.rentedBuildingOffer * resourcesStore.rentedBuilding * weights.residential +
+    stakeHoldingTradingStore.factoriesOffer * resourcesStore.factories * weights.factories;
+
+  const availabilityFactor = 1 - orgData.stake / 100;
+  const rawStake = (offerScore * availabilityFactor) / 1000000;
+
+  // Se a oferta ultrapassa o stake disponível, ajusta proporcionalmente todos os recursos
+  if (rawStake > availableStake) {
+    const reductionRatio = availableStake / rawStake;
+
+    stakeHoldingTradingStore.fundsOffer = Math.floor(stakeHoldingTradingStore.fundsOffer * reductionRatio);
+    stakeHoldingTradingStore.copperWireinMeterOffer = Math.floor(stakeHoldingTradingStore.copperWireinMeterOffer * reductionRatio);
+    stakeHoldingTradingStore.rentedBuildingOffer = Math.floor(stakeHoldingTradingStore.rentedBuildingOffer * reductionRatio);
+    stakeHoldingTradingStore.factoriesOffer = Math.floor(stakeHoldingTradingStore.factoriesOffer * reductionRatio);
+  }
+}
+
+function normalizeStakeDistribution() {
+  const total =
+    stakeHoldingTradingStore.You +
+    stakeHoldingTradingStore.Governments.stake +
+    stakeHoldingTradingStore.TechCorporations.stake +
+    stakeHoldingTradingStore.FinancialFunds.stake +
+    stakeHoldingTradingStore.NGOs.stake;
+
+  const error = total - 100;
+
+  if (Math.abs(error) > 0.001) {
+    // Subtrai/redistribui erro para a organização com maior stake
+    let maxOrg = "Government";
+    let maxValue = stakeHoldingTradingStore.Governments.stake;
+
+    for (const orgName of ["TechCorporations", "FinancialFunds", "NGOs"]) {
+      if (stakeHoldingTradingStore[orgName].stake > maxValue) {
+        maxValue = stakeHoldingTradingStore[orgName].stake;
+        maxOrg = orgName;
+      }
+    }
+
+    stakeHoldingTradingStore[maxOrg].stake -= error;
   }
 }
 
@@ -138,17 +205,25 @@ const tabClose = () => {
 };
 
 const confirmStake = () => {
+  reduceOfferToMaxStake(); // Reduz a oferta se ela exceder o stake da organização
+
   const org = stakeHoldingTradingStore.selectedOrganization.replace(" ", "");
   const orgData = stakeHoldingTradingStore[org];
   const offerScore = calculateStakeOffer();
 
-  stakeHoldingTradingStore.You += offerScore;
-  orgData.stake -= offerScore;
+  const maxStakeReceivable = Math.min(offerScore, 100 - stakeHoldingTradingStore.You);
 
-  game.funds -= stakeHoldingTradingStore.fundsOffer;
-  game.copperWireinMeter -= stakeHoldingTradingStore.copperWireinMeterOffer;
-  continentRealEstateStore[selectedContinentStore.name].rentedBuildings -= stakeHoldingTradingStore.rentedBuildingOffer;
-  continentRealEstateStore[selectedContinentStore.name].factories -= stakeHoldingTradingStore.factoriesOffer;
+  stakeHoldingTradingStore.You += maxStakeReceivable;
+  orgData.stake = Math.max(0, orgData.stake - maxStakeReceivable);
+
+  const usedRatio = maxStakeReceivable / offerScore;
+
+  game.funds -= Math.floor(stakeHoldingTradingStore.fundsOffer * usedRatio);
+  game.copperWireinMeter -= Math.floor(stakeHoldingTradingStore.copperWireinMeterOffer * usedRatio);
+  continentRealEstateStore[selectedContinentStore.name].rentedBuildings -= Math.floor(stakeHoldingTradingStore.rentedBuildingOffer * usedRatio);
+  continentRealEstateStore[selectedContinentStore.name].factories -= Math.floor(stakeHoldingTradingStore.factoriesOffer * usedRatio);
+
+  normalizeStakeDistribution();
 
   tabClose();
 };
