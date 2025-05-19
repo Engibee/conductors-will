@@ -27,7 +27,9 @@ function buy() {
 
 <style scoped>
 .perk-box {
-  display:block;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   font-size: 0.5vw;
 }
 </style>

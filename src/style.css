@@ -151,6 +151,9 @@ h4 {
 .industrial-perks {
   grid-column: 1;
   grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 12.57vw;
   height: 16.01vh;
 }
@@ -158,6 +161,9 @@ h4 {
 .commodity-perks {
   grid-column: 1;
   grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 12.57vw;
   height: 16.01vh;
 }
@@ -165,6 +171,9 @@ h4 {
 .marketing-perks {
   grid-column: 2;
   grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 12.57vw;
   height: 16.01vh;
 }
@@ -172,6 +181,9 @@ h4 {
 .innovation-perks {
   grid-column: 2;
   grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 12.57vw;
   height: 16.01vh;
 }
@@ -236,6 +248,7 @@ h4 {
 }
 
 .card.refinery {
+  transition: transform 0.4s ease-in-out;
   background-color: #514756;
   grid-column: 2;
   grid-row: 1;
@@ -243,17 +256,24 @@ h4 {
   border: 0;
   width: 22.26vw;
   height: 29.06vh;
-  margin-left: 0.78vw; /*22.61vw;*/
+  margin-left: 22.61vw;
   text-align: justify;
+  padding: 1.703vh 0.781vw;
   display: flex;
   flex-direction: column;
   z-index: 5;
 }
 
-.card.refinery.refinery-moved {
-  transform: translateX(21.05vw);
-  transition: transform 0.4s ease-in-out;
-  padding: 1.703vh 0.781vw;
+.refinery-slide-enter-active {
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+.refinery-slide-enter-from {
+  transform: translateX(-30%);
+  opacity: 0;
+}
+.refinery-slide-enter-to {
+  transform: translateX(0);
+  opacity: 1;
 }
 
 .autoinfo {

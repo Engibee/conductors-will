@@ -253,19 +253,23 @@ export function usePaperclipGame() {
     }
   }
   function assignRefinery() {
-    transaction.spend(3500) ? game.refiners++ : alert("Not enough funds to hire a refiner.");
+    transaction.spend(3500)
+      ? game.refiners++
+      : alert("Not enough funds to hire a refiner.");
   }
 
-  // Update the refinery logic in your tick handler
   function refinery_handler() {
-    if (
-      game.availableCopperOre >=
-      (game.refiners + realEstate.totalFactories) * 100
-    ) {
-      game.availableCopper += (game.refiners + realEstate.totalFactories) * 100;
-      game.availableCopperOre -=
-        (game.refiners + realEstate.totalFactories) * 100;
-    }
+    const totalRefiners = game.refiners + realEstate.totalFactories;
+    const orePerKg = 100;
+
+    const maxOreRefinable = totalRefiners * orePerKg;
+
+    const oreToRefine = Math.min(game.availableCopperOre, maxOreRefinable);
+
+    const copperProduced = oreToRefine / orePerKg;
+
+    game.availableCopper += copperProduced;
+    game.availableCopperOre -= oreToRefine;
   }
   return {
     currentDemand,

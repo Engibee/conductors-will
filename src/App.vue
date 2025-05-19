@@ -117,16 +117,18 @@ watch(
         <div class="autoinfo">
           <div class="button-group">
             <button @click="buy_worker">Hire</button>
-            <p>Wirers: {{ game.wirers || 0}} (+
-              {{ realEstate.totalFactories * 50}} in factories)</p>
+            <p>
+              Wirers: {{ game.wirers || 0 }} (+
+              {{ realEstate.totalFactories * 50 }} in factories)
+            </p>
           </div>
           <p>Price: ${{ formatPrice(game.workersPrice) }}</p>
         </div>
         <p class="mini_info">Makes 1m wire per worker per tick</p>
       </div>
     </transition>
-    <div class="card refinery" v-if="perks.hasRefinery && perks.hasMachinery">
-      <div class="card refinery" :class="{ 'refinery-moved': perks.hasRefinery }">
+    <transition name="refinery-slide">
+      <div class="card refinery" v-if="perks.hasRefinery">
         <h3>Copper Refinery</h3>
         <div class="refinery-info">
           <div class="button-group">
@@ -141,7 +143,7 @@ watch(
         </div>
         <p class="mini_info">Refines 100 ore to 1kg copper per worker</p>
       </div>
-    </div>
+    </transition>
     <div ref="logContainer" class="card terminal">
       <div class="time">
         📅 Week: {{ game.week }} | 📆 Month: {{ formatDate(game.month) }} | 📅
