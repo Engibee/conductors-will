@@ -7,6 +7,7 @@ import {
 } from "./stores/realEstateStore.js";
 import { useChartStore } from "./stores/chartStore.js";
 import { usePerkStore } from "./stores/perkStore.js";
+import { useStakeHoldingTradingStore } from "./stores/stakeTrading.js";
 import PerkCard from "./components/PerkCards.vue";
 import TickHandler from "./components/TickHandler.vue";
 import WorldMap from "./components/WorldMap.vue";
@@ -43,6 +44,7 @@ const realEstate = useContinentRealEstateStore();
 const selectedContinent = useSelectedContinentStore();
 const chart = useChartStore();
 const perks = usePerkStore();
+const stakeTrading = useStakeHoldingTradingStore();
 const logContainer = ref(null);
 
 watch(
@@ -139,7 +141,7 @@ watch(
             </p>
           </div>
           <p>Price: $3,500</p>
-          <p>Ore: {{ game.availableCopperOre.toLocaleString() }}</p>
+          <p>Ore: {{ game.availableCopperOre.toLocaleString() }} (+ {{(Math.pow(stakeTrading.You, 1.1) * 1000).toLocaleString() }} ore mined per second)</p>
         </div>
         <p class="mini_info">Refines 100 ore to 1kg copper per worker</p>
       </div>
