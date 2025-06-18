@@ -179,17 +179,39 @@ function normalizeStakeDistribution() {
   const error = total - 100;
 
   if (Math.abs(error) > 0.001) {
-    let maxOrg = "Government";
-    let maxValue = stakeHoldingTradingStore.Governments.stake;
+    // Find organization with highest stake that's not close to zero
+    let maxOrg = null;
+    let maxValue = 0;
 
-    for (const orgName of ["TechCorporations", "FinancialFunds", "NGOs"]) {
-      if (stakeHoldingTradingStore[orgName].stake > maxValue) {
-        maxValue = stakeHoldingTradingStore[orgName].stake;
+    for (const orgName of ["Governments", "TechCorporations", "FinancialFunds", "NGOs"]) {
+      const stake = stakeHoldingTradingStore[orgName].stake;
+      // Only consider organizations with enough stake to absorb the error
+      if (stake > Math.abs(error) + 0.01 && stake > maxValue) {
+        maxValue = stake;
         maxOrg = orgName;
       }
     }
 
-    stakeHoldingTradingStore[maxOrg].stake -= error;
+    // If no suitable organization found, distribute among all non-zero stakes
+    if (!maxOrg) {
+      const orgs = ["Governments", "TechCorporations", "FinancialFunds", "NGOs"];
+      const nonZeroOrgs = orgs.filter(org => stakeHoldingTradingStore[org].stake > 0.01);
+      
+      if (nonZeroOrgs.length > 0) {
+        const adjustmentPerOrg = error / nonZeroOrgs.length;
+        nonZeroOrgs.forEach(org => {
+          stakeHoldingTradingStore[org].stake = Math.max(0, stakeHoldingTradingStore[org].stake - adjustmentPerOrg);
+        });
+      } else {
+        // If all orgs have near-zero stake, adjust player's stake
+        stakeHoldingTradingStore.You = 100;
+        orgs.forEach(org => {
+          stakeHoldingTradingStore[org].stake = 0;
+        });
+      }
+    } else {
+      stakeHoldingTradingStore[maxOrg].stake -= error;
+    }
   }
 }
 
