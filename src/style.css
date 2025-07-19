@@ -377,6 +377,7 @@ h4 {
   height: 19.42vh;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center; 
 }
 
