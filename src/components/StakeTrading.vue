@@ -229,6 +229,12 @@ const confirmStake = () => {
   const orgData = stakeHoldingTradingStore[org];
   const offerScore = calculateStakeOffer();
 
+  // Prevent NaN from division by zero if no offer is made
+  if (offerScore === 0) {
+    tabClose();
+    return;
+  }
+
   const maxStakeReceivable = Math.min(offerScore, 100 - stakeHoldingTradingStore.You);
 
   stakeHoldingTradingStore.You += maxStakeReceivable;
